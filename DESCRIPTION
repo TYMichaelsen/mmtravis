@@ -1,12 +1,15 @@
 Package: mmtravis
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-Depends: R (>= 3.5.0)
-Imports: 
-  tidyverse
-License: What license is it under?
+Type: Package
+Title: Tools for analysing (meta)transcriptomics data
+Version: 0.1.1
+Authors@R: c(person(c("Thomas","Yssing"),"Michaelsen",role = c("aut", "cre"),email = "tym@bio.aau.dk"),person("Mads", "Albertsen",role = c("ctb"), email = "MadsAlbertsen85@gmail.com"))
+Description: mmtravis is a small set of tools that allows effortless analysis and visualization of NGS transcriptomics data.
+License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.0.1
+Depends: 
+  R (>= 3.5.0)
+  ggplot2
+Imports: 
+  tidyverse
