@@ -1,9 +1,12 @@
 Package: mmtravis
 Type: Package
 Title: Tools for analysing (meta)transcriptomics data
-Version: 0.1.1
-Authors@R: c(person(c("Thomas","Yssing"),"Michaelsen",role = c("aut", "cre"),email = "tym@bio.aau.dk"),person("Mads", "Albertsen",role = c("ctb"), email = "MadsAlbertsen85@gmail.com"))
+Version: 0.1.0
+Authors@R: c(person(c("Thomas","Yssing"),"Michaelsen",role = c("aut", "cre"),email = "tym@bio.aau.dk"),
+             person(c("Kasper","Skytte"),"Andersen",role = c("ctb"),email = "ksa@bio.aau.dk"),
+			 person("Mads", "Albertsen",role = c("ctb"), email = "MadsAlbertsen85@gmail.com"))
 Description: mmtravis is a small set of tools that allows effortless analysis and visualization of NGS transcriptomics data.
+BugReports: https://github.com/TYMichaelsen/mmtravis/issues
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true

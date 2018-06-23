@@ -35,8 +35,8 @@ Check out the blog posts at <http://albertsenlab.org/> about mmtravis:
 Releases
 --------
 
-To install a specific (older) release of ampvis2 use `"@release"` as
-suffix, fx `remotes::install_github("TYMichaelsen/travis@1.0")` to
+To install a specific (older) release of mmtravis use `"@release"` as
+suffix, fx `remotes::install_github("TYMichaelsen/mmtravis@1.0")` to
 install the first release (1.0) of mmtravis. The latest stable release
 can be installed with
 `remotes::install_github("TYMichaelsen/mmtravis@*release")`.
