@@ -4,29 +4,27 @@
 \alias{mt_load}
 \title{mt_load}
 \usage{
-mt_load(mtcount, mtgene = NULL, mtmeta = NULL, mtstat = NULL)
+mt_load(mtdata, mtgene = NULL, mtmeta = NULL)
 }
 \arguments{
-\item{mtcount}{(\emph{required}) data.frame with read counts.}
+\item{mtdata}{(\emph{required}) data.frame with read expressions.}
 
 \item{mtgene}{(\emph{optional}) data.frame with metadata associated to genes (rows).}
 
 \item{mtmeta}{(\emph{optional}) data.frame with metadata associated to samples (columns).}
-
-\item{mtstat}{(\emph{optional}) data.frame with sequencing stats associated to samples (columns).}
 }
 \value{
-A list of class \code{"mt"} with 3 to 4 elements.
+A list of class \code{"mt"} with 3 elements.
 }
 \description{
-This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtranscriptome functions. It is therefore required to load data with \code{\link{mt_load}} before any other mmtranscriptome functions can be used.
+This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtravis functions. It is therefore required to load data with \code{\link{mt_load}} before any other mmtravis functions can be used.
 }
 \details{
 The \code{\link{mt_load}} function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.
 }
-\section{The mtcount}{
+\section{The mtdata}{
 
-The mtcount-table contains read counts for all genes in each sample. The provided mtcount-table must be a data frame with the following requirements:
+The mtdata-table contains read expressions for all genes in each sample. The provided mtdata-table must be a data frame with the following requirements:
 
 \itemize{
   \item The rows are gene IDs and the columns are samples.
@@ -35,7 +33,7 @@ The mtcount-table contains read counts for all genes in each sample. The provide
   \item Generally avoid special characters and spaces in row- and column names.
 }
 
-A minimal example is available with \code{data("example_mtcount")}.
+A minimal example is available with \code{data("example_mtdata")}.
 }
 
 \section{The mtgene}{
@@ -43,7 +41,7 @@ A minimal example is available with \code{data("example_mtcount")}.
 The mtgene-table contains additional information about the genes, for example reference database ID's, product, and function, which can be used during analysis. The amount of information in the mtgene-table is unlimited, it can contain any number of columns (variables), however there are a few requirements:
 
 \itemize{
-  \item The gene IDs must be in the first column. These must match exactly to those in the mtcount-table.
+  \item The gene IDs must be in the first column. These must match exactly to those in the mtdata-table.
   \item Column classes matter, categorical variables should be loaded either \code{as.character()} or \code{as.factor()}, and continuous variables \code{as.numeric()}. See below.
   \item Generally avoid special characters and spaces in row- and column names.
 }
@@ -58,7 +56,7 @@ A minimal example is available with \code{data("example_mtgene")}.
 The mtmeta-table contains additional information about the samples, for example where each sample was taken, date, pH, treatment etc, which is used to compare and group the samples during analysis. The amount of information in the mtmeta-table is unlimited, it can contain any number of columns (variables), however there are a few requirements:
 
 \itemize{
-  \item The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtcount-table.
+  \item The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtdata-table.
   \item Column classes matter, categorical variables should be loaded either \code{as.character()} or \code{as.factor()}, and continuous variables \code{as.numeric()}. See below.
   \item Generally avoid special characters and spaces in row- and column names.
 }
@@ -70,24 +68,21 @@ The \code{\link{mt_load}} function will automatically use the sample IDs in the 
 A minimal example is available with \code{data("example_mtmeta")}.
 }
 
-\section{The mtstat}{
-
-The mtstat-table contains sequencing statistics for the samples, and must comply to the following requirements:
-
-\itemize{
-  \item The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtcount-table.
-  \item A column named "Raw", with the raw number of sequences before QC and filtering.
-  \item A column named "QC", with the number of sequences after QC.
-  \item A column named "filtered", with the number of sequences after additional removal of rRNA.
-}
-
-The mtstat-table is used for QC assesment.
-
-A minimal example is available with \code{data("example_mtstat")}.
-}
-
 \examples{
-This
+
+\dontrun{
+# Load the different components.
+data("example_mtmeta")
+data("example_mtgene")
+data("example_mtdata")
+
+# Combine in one object of class 'mmt'.
+mt <- mt_load(mtdata = example_mtdata,mtgene = example_mtgene,mtmeta = example_mtmeta)
+
+#Show a short summary about the data by simply typing the name of the object in the console
+mt
+}
+
 }
 \author{
 Thomas Yssing Michaelsen \email{tym@bio.aau.dk}

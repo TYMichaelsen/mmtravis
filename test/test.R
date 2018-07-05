@@ -2,10 +2,10 @@
 library(magrittr)
 library(readxl)
 library(tidyverse)
-library(mmtranscriptome)
+library(mmtravis)
 
 ### Load data.
-mtmeta  <- read_excel("test/metadata_2.xlsx") %>%
+mtmeta  <- read_excel("test/metadata.xlsx") %>%
   as.data.frame() %>%
   mutate(Samplename = gsub("_SP","",Samplename)) %>%
   separate(
@@ -13,69 +13,62 @@ mtmeta  <- read_excel("test/metadata_2.xlsx") %>%
     into = c("Genus","Replicate","Type"),
     sep  = "_")
 
-mtstat <- read.delim(
-  file             = "test/seqstat_2.txt",
-  header           = T,
-  stringsAsFactors = F)
+mt <- mt_loadMetaT(counts.txt = "test/counts.txt",seqstat.txt = "test/seqstat.txt",mtmeta = mtmeta)
 
-count_tab <- read.delim(
-  file             = "test/counts_2.txt",
-  header           = T,
-  stringsAsFactors = F,
-  check.names      = F)
-metaVars <- colnames(count_tab)[2] %>%
-  gsub("[{]|[}]","",x = .) %>%
-  {strsplit(.,split = ";")[[1]]}
+### Test functions. ############################################################
+# Subset.
+mt     <- mt_subset(example_mmt,minreads = 5000,normalise = "total")
 
-mtgene <- select(count_tab,1,2) %>%
-  separate(.,
-    col    = 2,
-    into   = metaVars,
-    sep    = "[|];[|]",
-    remove = T)
+data("example_mmt")
 
-mtcount <- select(count_tab,-2)
+# Plot all samples (might take some time)
+mt_plotpairs(example_mmt)
 
-### Test functions.
+# Plot replicates to see correlation.
+mt_plotpairs(example_mmt,samples = c("HQ180323_13","HQ180323_14"),label_by = "Replicate")
 
-mt <- mt_load(mtcount = mtcount,mtgene = mtgene,mtstat = mtstat,mtmeta = mtmeta)
+# Ordination.
+vis_ordinate(mt,
+  sample_color_by = "Genus",
+  sample_shape_by = "Replicate")
+
+# Boxplotting.
+# Let's plot some random genes.
+wh <- example_mmt$mtdata$GeneID[c(1,22,11,53)]
 
 
-mt_stats(mt,group_by = "Genus")
+vis_boxplot(example_mmt,
+  group_by    = "Type",
+  boxgroup_by = "Organism",
+  row_show    = 10,
+  row_labels  = "product",
+  title_newline = T)
+
+vis_boxplot(AalborgWWTPs,group_by = "Period")
+
+# Differential expression stuff.
+DE_mt <- mt_diffexprs(mt,
+  group      = "Type",
+  row_labels = c("GeneID","product"),
+  intercept  = "ANAMMOX")
+
+# Load data.
+data("example_mmt")
+
+# Compute the statistics.
+DE_mt <- mt_diffexprs(example_mmt,
+                      group      = "Type",
+                      row_labels = c("GeneID","product"),
+                      intercept  = "ANAMMOX")
+
+# Extract results for given levels.
+mt_res <- mt_dumpDE(DE_mt,nom = "ELECTRODE",denom = "SUSPENTION")
+
+# Show the output.
+mt_res$MAplot
+mt_res$BOXplot
+head(mt_res$Table)
 
 
-mt_binstats <- function(mt){
 
-  out <- list()
-
-  ### GET SOME BIN STATS, IF POSSIBLE ###
-  if(!is.null(mt$gene) & any(tolower(colnames(mt$gene)) %in% c("contig","scaffold"))){
-    wh <- grep("contig|scaffold",colnames(mt$gene),value = T,ignore.case=TRUE)[1]
-
-    # Get number of contigs/scaffolds.
-    out$no_bins <- mt$gene %>%
-      .[[wh]] %>%
-      unique() %>%
-      length()
-    # Get average gene expression of each bin.
-    avg <- gather(mt$count,key = SampleID,value = Expr,-GeneID) %>%
-      left_join(.,mt$gene,by = "GeneID") %>%
-      group_by_(wh,"SampleID") %>%
-      summarize(avg = median(Expr)) %>%
-      filter(avg != 0)
-
-    out$expr_bins
-
-    de <- avg %>% group_by(SampleID) %>% summarize(avg_sample = mean(avg))
-    ggplot(de,aes(x = SampleID,y = avg)) + geom_boxplot()
-
-  }
-
-  ### GET SOME SEQUENCING STATS, IF POSSIBLE ###
-  if(!is.null())
-
-}
-
-
-mt_stats(mt,group_by = "Genus")
 

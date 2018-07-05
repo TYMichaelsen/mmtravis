@@ -1,7 +1,7 @@
 Package: mmtravis
 Type: Package
 Title: Tools for analysing (meta)transcriptomics data
-Version: 0.1.0
+Version: 1.1.1
 Authors@R: c(person(c("Thomas","Yssing"),"Michaelsen",role = c("aut", "cre"),email = "tym@bio.aau.dk"),
              person(c("Kasper","Skytte"),"Andersen",role = c("ctb"),email = "ksa@bio.aau.dk"),
 			 person("Mads", "Albertsen",role = c("ctb"), email = "MadsAlbertsen85@gmail.com"))

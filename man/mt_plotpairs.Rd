@@ -4,13 +4,13 @@
 \alias{mt_plotpairs}
 \title{Plot multiple combinations of sample gene expressions in a pairs plot}
 \usage{
-mt_plotpairs(mt, samples = NULL, label_by = NULL, textsize = 5,
+mt_plotpairs(mmt, samples = NULL, label_by = NULL, textsize = 5,
   pointsize = 2)
 }
 \arguments{
-\item{mt}{(\emph{required}) A \code{mt} list loaded with \code{\link{mt_load}}.}
+\item{mmt}{(\emph{required}) A \code{mmt} list loaded with \code{\link{mt_load}}.}
 
-\item{samples}{A vector of 3 or more sample names in \code{mt} to plot on each axis. If NULL, the default, then all samples will be plotted. (\emph{Default: } \code{NULL})}
+\item{samples}{A vector of 3 or more sample names in \code{mmt} to plot on each axis. If NULL, the default, then all samples will be plotted. (\emph{Default: } \code{NULL})}
 
 \item{label_by}{replace the SampleIDs plotted in the diagonal with one(!) column in the metadata.}
 
@@ -22,10 +22,18 @@ mt_plotpairs(mt, samples = NULL, label_by = NULL, textsize = 5,
 A ggplot2 object.
 }
 \description{
-Plots the gene expression from multiple samples in a \code{mt} object in a grid plot with all pairs of variables.
+Plots the gene expression from multiple samples in a \code{mmt} object in a grid plot with all pairs of variables.
 }
 \examples{
-Some example
+\dontrun{
+data("example_mmt")
+
+# Plot all samples (might take some time)
+mt_plotpairs(example_mmt)
+
+# Plot replicates and relabel.
+mt_plotpairs(example_mmt,samples = c("HQ180323_13","HQ180323_14"),label_by = "Replicate")
+}
 
 }
 \author{

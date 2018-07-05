@@ -1,9 +1,9 @@
 #' @title Plot multiple combinations of sample gene expressions in a pairs plot
 #'
-#' @description Plots the gene expression from multiple samples in a \code{mt} object in a grid plot with all pairs of variables.
+#' @description Plots the gene expression from multiple samples in a \code{mmt} object in a grid plot with all pairs of variables.
 #'
-#' @param mt (\emph{required}) A \code{mt} list loaded with \code{\link{mt_load}}.
-#' @param samples A vector of 3 or more sample names in \code{mt} to plot on each axis. If NULL, the default, then all samples will be plotted. (\emph{Default: } \code{NULL})
+#' @param mmt (\emph{required}) A \code{mmt} list loaded with \code{\link{mt_load}}.
+#' @param samples A vector of 3 or more sample names in \code{mmt} to plot on each axis. If NULL, the default, then all samples will be plotted. (\emph{Default: } \code{NULL})
 #' @param label_by replace the SampleIDs plotted in the diagonal with one(!) column in the metadata.
 #' @param textsize The text size of the axis titles.
 #' @param pointsize The size of points in the plot.
@@ -17,26 +17,35 @@
 #' @importFrom dplyr transmute_ mutate_all
 #' @import ggplot2
 #'
-#' @examples Some example
+#' @examples
+#' \dontrun{
+#' data("example_mmt")
+#'
+#' # Plot all samples (might take some time)
+#' mt_plotpairs(example_mmt)
+#'
+#' # Plot replicates and relabel.
+#' mt_plotpairs(example_mmt,samples = c("HQ180323_13","HQ180323_14"),label_by = "Replicate")
+#' }
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
 
-mt_plotpairs <- function(mt,
+mt_plotpairs <- function(mmt,
                          samples   = NULL,
                          label_by  = NULL,
                          textsize  = 5,
                          pointsize = 2){
 
   if(is.null(samples)) {
-    samples <- mt$meta$SampleID
+    samples <- mmt$mtmeta[[1]]
   }
   if(!is.character(samples))
     stop("The samples to plot must be provided as a character vector with 3 or more sample names", call. = FALSE)
 
   ## Label by metadata instead.
   if(!is.null(label_by)){
-    if (label_by %in% colnames(mt$meta)){
-      label_by <- mt$meta[[label_by]]
+    if (label_by %in% colnames(mmt$mtmeta)){
+      label_by <- mmt$mtmeta[[label_by]]
     } else {
       stop("Your 'label_by' is not in metadata.",call. = FALSE)
     }
@@ -61,7 +70,7 @@ mt_plotpairs <- function(mt,
           panel.border = element_blank())
 
   ## Prepare the data.
-  dat <- mt$count[,-1] %>% {log2(. + 1)}
+  dat <- mmt$mtdata[,-1] %>% {log2(. + 1)}
   rng <- range(dat)
 
   ## Iterate through the different combinations of plots.
@@ -111,9 +120,9 @@ mt_plotpairs <- function(mt,
     }
   }
   ncol <- temp %>%
-    length() %>%
-    sqrt() %>%
-    floor() %>%
-    as.integer()
-  do.call(cowplot::plot_grid, c(temp, ncol = ncol, align = "hv"))
+    length(.) %>%
+    sqrt(.) %>%
+    floor(.) %>%
+    as.integer(.)
+  cowplot::plot_grid(plotlist = temp,ncol = ncol,align = "hv")
 }

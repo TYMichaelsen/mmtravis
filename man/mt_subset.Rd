@@ -7,13 +7,20 @@
 mt_subset(data, ...)
 }
 \arguments{
-\item{mt}{(\emph{required}) Data list as loaded with \code{\link{mt_load}}.}
-
 \item{sub_genes}{(\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \code{subset()}.}
 
 \item{sub_samples}{(\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \code{subset()}.}
 
 \item{minreads}{Minimum number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})}
+
+\item{normalise}{Transform the read counts AFTER reads have been removed by the minreads argument. (\emph{default:} \code{"none"})
+\itemize{
+   \item \code{"total"}: Normalise the read counts to be in percent per sample.
+   \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
+   \item \code{"none"}: No normalisation.
+   }}
+
+\item{mt}{(\emph{required}) Data list as loaded with \code{\link{mt_load}}.}
 }
 \value{
 A modifed mt object
@@ -23,6 +30,37 @@ Subsets the data in ampvis2 objects based on metadata and returns the subsetted 
 }
 \details{
 The subset is performed on the mtmeta/mtgene data by \code{subset()} and the whole object is then adjusted accordingly.
+}
+\examples{
+
+\dontrun{
+# Get some data.
+data("example_mmt")
+
+# Let's subset to contig 1, 7675, and 69676.
+mt1 <- mt_subset(example_mmt,sub_genes = "contig \%in\% c(1,7675,69676)")
+mt1
+
+# Let's subset to specific organism.
+mt2 <- mt_subset(example_mmt,sub_samples = "Organism == 'Brocadia'")
+mt2
+
+# Let's do both and remove genes with less than 10000 reads in total.
+mt3 <- mt_subset(example_mmt,
+  sub_samples = "Organism == 'Brocadia'",
+  sub_genes   = "contig \%in\% c(1,7675,69676)",
+  minreads    = 10000)
+mt3
+
+# You can also normalise the data and subset.
+mt4 <- mt_subset(example_mmt,
+  sub_samples = "Organism == 'Brocadia'",
+  sub_genes   = "contig \%in\% c(1,7675,69676)",
+  minreads    = 10000,
+  normalise   = "libsize")
+mt4 # Note "Normalised:" is now included.
+}
+
 }
 \author{
 Thomas Yssing Michaelsen \email{tym@bio.aau.dk}
