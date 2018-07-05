@@ -1,6 +1,6 @@
 #' Subset mt objects based on sample metadata
 #'
-#' Subsets the data in ampvis2 objects based on metadata and returns the subsetted object.
+#' @title Normalise and subset the data in \code{mmt} objects based on variable/sample metadata.
 #'
 #' @usage mt_subset(data, ...)
 #'

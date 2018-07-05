@@ -1,6 +1,8 @@
 #' mt_diffexprs
 #'
-#' This function calculates differential expression by grouping variable supplied by the user.
+#' @title Calculate differential expression statistics by a grouping variable.
+#'
+#' @usage mt_diffexprs(obj,group)
 #'
 #' @param obj     (\emph{required}) An object of class 'mmt' (see \code{\link{mt_load}}) or 'ampvis2' (see \code{amp_load}).
 #' @param group   (\emph{required}) Character string defining the grouping variable to use for differential expression.

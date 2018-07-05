@@ -1,6 +1,8 @@
 #' mt_load
 #'
-#' This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtravis functions. It is therefore required to load data with \code{\link{mt_load}} before any other mmtravis functions can be used.
+#' @title Load the transcriptomics data, associated gene data and metadata.
+#'
+#' @usage mt_load(mtdata,mtgene = NULL,mtmeta = NULL)
 #'
 #' @param mtdata (\emph{required}) data.frame with read expressions.
 #' @param mtgene  (\emph{optional}) data.frame with metadata associated to genes (rows).

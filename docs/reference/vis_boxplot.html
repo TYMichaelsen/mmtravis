@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Normalise and subset the data in <code>mmt</code> objects based on variable/sample metadata. — mt_subset • mmtravis</title>
+<title>Visually appealing boxplots — vis_boxplot • mmtravis</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Normalise and subset the data in <code>mmt</code> objects based on variable/sample metadata. — mt_subset" />
+<meta property="og:title" content="Visually appealing boxplots — vis_boxplot" />
 
-<meta property="og:description" content="Subset mt objects based on sample metadata" />
+<meta property="og:description" content="Boxplot" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,87 +92,133 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Normalise and subset the data in <code>mmt</code> objects based on variable/sample metadata.</h1>
+    <h1>Visually appealing boxplots</h1>
     
-    <div class="hidden name"><code>mt_subset.Rd</code></div>
+    <div class="hidden name"><code>vis_boxplot.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Subset mt objects based on sample metadata</p>
+    <p>Boxplot</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_subset</span>(<span class='no'>data</span>, <span class='no'>...</span>)</pre>
+    <pre class="usage"><span class='fu'>vis_boxplot</span>(<span class='no'>obj</span>,<span class='no'>group_by</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>sub_genes</th>
-      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to <code>subset()</code>.</p></td>
+      <th>obj</th>
+      <td><p>(<em>required</em>) A data object of class 'ampvis2' (see <code><a href='http://www.rdocumentation.org/packages/ampvis2/topics/amp_load'>amp_load</a></code>) or class 'mmt' (see <code><a href='mt_load.html'>mt_load</a></code>).</p></td>
     </tr>
     <tr>
-      <th>sub_samples</th>
-      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to <code>subset()</code>.</p></td>
+      <th>group_by</th>
+      <td><p>(<em>required</em>) Group the samples by a variable in the metadata.</p></td>
     </tr>
     <tr>
-      <th>minreads</th>
-      <td><p>Minimum number of reads pr. gene. Genes below this value will be removed. (<em>default:</em> <code>0</code>)</p></td>
+      <th>boxgroup_by</th>
+      <td><p>Group the samples within each boxplot by a variable in the metadata.</p></td>
+    </tr>
+    <tr>
+      <th>sort_by</th>
+      <td><p>Sort the boxplots by <code>"median"</code>, <code>"mean"</code> or <code>"total"</code>. (<em>default:</em> <code>"median"</code>)</p></td>
     </tr>
     <tr>
       <th>normalise</th>
-      <td><p>Transform the read counts AFTER reads have been removed by the minreads argument. (<em>default:</em> <code>"none"</code>)</p><ul>
+      <td><p>Can take one of following arguments: (<em>default:</em> <code>"libsize"</code>)</p><ul>
 <li><p><code>"total"</code>: Normalise the read counts to be in percent per sample.</p></li>
 <li><p><code>"libsize"</code>: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See <a href='http://www.rdocumentation.org/packages/DESeq2/topics/estimateSizeFactorsForMatrix'>estimateSizeFactorsForMatrix</a> for details.</p></li>
 <li><p><code>"none"</code>: No normalisation.</p></li>
 </ul></td>
     </tr>
     <tr>
-      <th>mt</th>
-      <td><p>(<em>required</em>) Data list as loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
+      <th>plot_type</th>
+      <td><p>Plot type. <code>"boxplot"</code> or <code>"point"</code>. (<em>default:</em> <code>"boxplot"</code>)</p></td>
+    </tr>
+    <tr>
+      <th>point_size</th>
+      <td><p>The size of points. (<em>default:</em> <code>1</code>)</p></td>
+    </tr>
+    <tr>
+      <th>row_show</th>
+      <td><p>The number of variables to show, or a vector of gene/OTU names. (<em>default:</em> <code>20</code>)</p></td>
+    </tr>
+    <tr>
+      <th>order_group</th>
+      <td><p>A vector to order the groups by.</p></td>
+    </tr>
+    <tr>
+      <th>order_boxgroup</th>
+      <td><p>A vector to order the box-groups by.</p></td>
+    </tr>
+    <tr>
+      <th>title_newline</th>
+      <td><p>Split the facet headers by newline. (<em>default:</em> <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>title_size</th>
+      <td><p>Size of text in facet headers. (<em>default:</em> <code>5</code>)</p></td>
+    </tr>
+    <tr>
+      <th>plot_flip</th>
+      <td><p>(<em>logical</em>) Flip the axes of the plot axis. (<em>default:</em> <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>plot_log</th>
+      <td><p>(<em>logical</em>) Log10-scale the plot. (<em>default:</em> <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>adjust_zero</th>
+      <td><p>Keep values of 0 in calculations by adding this value. (<em>default:</em> <code>NULL</code>)</p></td>
+    </tr>
+    <tr>
+      <th>detailed_output</th>
+      <td><p>(<em>logical</em>) Return additional details or not. If <code>TRUE</code>, it is recommended to save to an object and then access the additional data by <code>View(object$data)</code>. (<em>default:</em> <code>FALSE</code>)</p></td>
+    </tr>
+    <tr>
+      <th>row_labels</th>
+      <td><p>(<strong>mmtravis only</strong>) Additional variables in genedata to plot (<code>mmt</code>).</p></td>
+    </tr>
+    <tr>
+      <th>tax_class</th>
+      <td><p>(<strong>ampvis2 only</strong>) Converts a specific phylum to class level instead, e.g. <code>"p__Proteobacteria"</code>.</p></td>
+    </tr>
+    <tr>
+      <th>tax_empty</th>
+      <td><p>(<strong>ampvis2 only</strong>) How to show OTUs without taxonomic information. One of the following:</p><ul>
+<li><p><code>"remove"</code>: Remove OTUs without taxonomic information.</p></li>
+<li><p><code>"best"</code>: (<em>default</em>) Use the best classification possible.</p></li>
+<li><p><code>"OTU"</code>: Display the OTU name.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>tax_aggregate</th>
+      <td><p>(<strong>ampvis2 only</strong>) The taxonomic level to aggregate the OTUs. (<em>default:</em> <code>"Genus"</code>)</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A modifed mt object</p>
+    <p>A ggplot2 object. If <code>detailed_output = TRUE</code> a list with a ggplot2 object and additional data.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The subset is performed on the mtmeta/mtgene data by <code>subset()</code> and the whole object is then adjusted accordingly.</p>
+    <p>The plot is ordered as one would read a book, from left to right and top to bottom.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 </div><span class='co'># NOT RUN {</span>
-<span class='co'># Get some data.</span>
 <span class='fu'>data</span>(<span class='st'>"example_mmt"</span>)
 
-<span class='co'># Let's subset to contig 1, 7675, and 69676.</span>
-<span class='no'>mt1</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_subset</span>(<span class='no'>example_mmt</span>,<span class='kw'>sub_genes</span> <span class='kw'>=</span> <span class='st'>"contig %in% c(1,7675,69676)"</span>)
-<span class='no'>mt1</span>
-
-<span class='co'># Let's subset to specific organism.</span>
-<span class='no'>mt2</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_subset</span>(<span class='no'>example_mmt</span>,<span class='kw'>sub_samples</span> <span class='kw'>=</span> <span class='st'>"Organism == 'Brocadia'"</span>)
-<span class='no'>mt2</span>
-
-<span class='co'># Let's do both and remove genes with less than 10000 reads in total.</span>
-<span class='no'>mt3</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_subset</span>(<span class='no'>example_mmt</span>,
-  <span class='kw'>sub_samples</span> <span class='kw'>=</span> <span class='st'>"Organism == 'Brocadia'"</span>,
-  <span class='kw'>sub_genes</span>   <span class='kw'>=</span> <span class='st'>"contig %in% c(1,7675,69676)"</span>,
-  <span class='kw'>minreads</span>    <span class='kw'>=</span> <span class='fl'>10000</span>)
-<span class='no'>mt3</span>
-
-<span class='co'># You can also normalise the data and subset.</span>
-<span class='no'>mt4</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_subset</span>(<span class='no'>example_mmt</span>,
-  <span class='kw'>sub_samples</span> <span class='kw'>=</span> <span class='st'>"Organism == 'Brocadia'"</span>,
-  <span class='kw'>sub_genes</span>   <span class='kw'>=</span> <span class='st'>"contig %in% c(1,7675,69676)"</span>,
-  <span class='kw'>minreads</span>    <span class='kw'>=</span> <span class='fl'>10000</span>,
-  <span class='kw'>normalise</span>   <span class='kw'>=</span> <span class='st'>"libsize"</span>)
-<span class='no'>mt4</span> <span class='co'># Note "Normalised:" is now included.</span>
-<span class='co'># }</span><div class='input'>
-</div></pre>
+<span class='fu'>vis_boxplot</span>(<span class='no'>example_mmt</span>,
+  <span class='kw'>group_by</span>    <span class='kw'>=</span> <span class='st'>"Type"</span>,
+  <span class='kw'>boxgroup_by</span> <span class='kw'>=</span> <span class='st'>"Organism"</span>,
+  <span class='kw'>row_show</span>    <span class='kw'>=</span> <span class='fl'>10</span>,
+  <span class='kw'>row_labels</span>  <span class='kw'>=</span> <span class='st'>"product"</span>,
+  <span class='kw'>title_newline</span> <span class='kw'>=</span> <span class='no'>T</span>)
+<span class='co'># }</span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

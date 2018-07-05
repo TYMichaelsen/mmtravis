@@ -2,9 +2,9 @@
 % Please edit documentation in R/mt_load.R
 \name{mt_load}
 \alias{mt_load}
-\title{mt_load}
+\title{Load the transcriptomics data, associated gene data and metadata.}
 \usage{
-mt_load(mtdata, mtgene = NULL, mtmeta = NULL)
+mt_load(mtdata,mtgene = NULL,mtmeta = NULL)
 }
 \arguments{
 \item{mtdata}{(\emph{required}) data.frame with read expressions.}
@@ -17,7 +17,7 @@ mt_load(mtdata, mtgene = NULL, mtmeta = NULL)
 A list of class \code{"mt"} with 3 elements.
 }
 \description{
-This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtravis functions. It is therefore required to load data with \code{\link{mt_load}} before any other mmtravis functions can be used.
+mt_load
 }
 \details{
 The \code{\link{mt_load}} function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.

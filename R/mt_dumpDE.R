@@ -1,5 +1,7 @@
 #' mt_dumpDE
 #'
+#' @title Extract results from DE analysis done using \code{mt_diffexprs}.
+#'
 #' @usage mt_dumpDE(mmtDE,nom,denom)
 #'
 #' @param mmtDE (\emph{required}) An object of class \code{mmtDE}. See \code{\link{mt_diffexprs}}.

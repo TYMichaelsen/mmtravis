@@ -2,10 +2,9 @@
 % Please edit documentation in R/mt_diffexprs.R
 \name{mt_diffexprs}
 \alias{mt_diffexprs}
-\title{mt_diffexprs}
+\title{Calculate differential expression statistics by a grouping variable.}
 \usage{
-mt_diffexprs(obj, group, intercept = NULL, row_labels = NULL,
-  order_var_by = "variance", row_show = 10)
+mt_diffexprs(obj,group)
 }
 \arguments{
 \item{obj}{(\emph{required}) An object of class 'mmt' (see \code{\link{mt_load}}) or 'ampvis2' (see \code{amp_load}).}
@@ -29,7 +28,7 @@ A list with 2 elements:
 }
 }
 \description{
-This function calculates differential expression by grouping variable supplied by the user.
+mt_diffexprs
 }
 \details{
 Typically one would subset low-expression genes (use \code{\link{mt_subset}}) before performing the analysis, due to a low signal/noise ratio. This also drastically reduces computation times and improves stability of the parameter estimation.

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs • mmtravis</title>
+<title>Extract results from DE analysis done using <code>mt_diffexprs</code>. — mt_dumpDE • mmtravis</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs" />
+<meta property="og:title" content="Extract results from DE analysis done using <code>mt_diffexprs</code>. — mt_dumpDE" />
 
-<meta property="og:description" content="Plots the gene expression from multiple samples in a mmt object in a grid plot with all pairs of variables." />
+<meta property="og:description" content="mt_dumpDE" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,59 +92,96 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot multiple combinations of sample gene expressions in a pairs plot</h1>
+    <h1>Extract results from DE analysis done using <code>mt_diffexprs</code>.</h1>
     
-    <div class="hidden name"><code>mt_plotpairs.Rd</code></div>
+    <div class="hidden name"><code>mt_dumpDE.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Plots the gene expression from multiple samples in a <code>mmt</code> object in a grid plot with all pairs of variables.</p>
+    <p>mt_dumpDE</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_plotpairs</span>(<span class='no'>mmt</span>, <span class='kw'>samples</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>label_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>textsize</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>pointsize</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
+    <pre class="usage"><span class='fu'>mt_dumpDE</span>(<span class='no'>mmtDE</span>,<span class='no'>nom</span>,<span class='no'>denom</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mmt</th>
-      <td><p>(<em>required</em>) A <code>mmt</code> list loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
+      <th>mmtDE</th>
+      <td><p>(<em>required</em>) An object of class <code>mmtDE</code>. See <code><a href='mt_diffexprs.html'>mt_diffexprs</a></code>.</p></td>
     </tr>
     <tr>
-      <th>samples</th>
-      <td><p>A vector of 3 or more sample names in <code>mmt</code> to plot on each axis. If NULL, the default, then all samples will be plotted. (<em>Default: </em> <code>NULL</code>)</p></td>
+      <th>nom</th>
+      <td><p>(<em>required</em>) Level that should be in the nominator when doing the DE analysis.</p></td>
     </tr>
     <tr>
-      <th>label_by</th>
-      <td><p>replace the SampleIDs plotted in the diagonal with one(!) column in the metadata.</p></td>
+      <th>denom</th>
+      <td><p>(<em>required</em>) Level that should be in the denominator (i.e. the reference) when doing the DE analysis. If set to "rest", the DE analysis is done as a one-vs-all test. See XXX for details.</p></td>
     </tr>
     <tr>
-      <th>textsize</th>
-      <td><p>The text size of the axis titles.</p></td>
+      <th>signif</th>
+      <td><p>The threshold for adjusted p-value to be considered significant. (<em>default</em>: 0.01)</p></td>
     </tr>
     <tr>
-      <th>pointsize</th>
-      <td><p>The size of points in the plot.</p></td>
+      <th>text_MAplot_size</th>
+      <td><p>Size of text on the MA plot. (<em>default</em>: 3)</p></td>
+    </tr>
+    <tr>
+      <th>ngenes_show</th>
+      <td><p>The number of genes to show in the boxplot. (<em>default</em>: 10)</p></td>
+    </tr>
+    <tr>
+      <th>order_by</th>
+      <td><p>Order the boxplot and table by a statistic from the DE analysis. One of: (<em>default</em>: "logFC")</p><ul>
+<li><p>logFC - the absolute log2 fold-change betweem <code>nom</code> and <code>denom</code>.</p></li>
+<li><p>padj - the adjusted p-value of the DE analysis.</p></li>
+</ul></td>
+    </tr>
+    <tr>
+      <th>table_full</th>
+      <td><p>(<em>logical</em>) Output entire results table without filtering by significance. (<em>default</em>: FALSE)</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Additional arguments parsed to the <code><a href='vis_boxplot.html'>vis_boxplot</a></code> function.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot2 object.</p>
+    <p>A list with 3 elements:</p><ul>
+<li><p><strong>MAplot</strong> - A MAplot (ggplot-object) with the gene expression plotted against the log2 fold-change.</p></li>
+<li><p><strong>BOXplot</strong> - A faceted boxplot showing the expression of the most interesting genes, grouped according to the DE analysis design.</p></li>
+<li><p><strong>Table</strong> - A table with the variable metadata and associated statistics from the DE analysis.</p></li>
+</ul>
+
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
+    <pre class="examples"><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+<span class='co'># Load data.</span>
 <span class='fu'>data</span>(<span class='st'>"example_mmt"</span>)
 
-<span class='co'># Plot all samples (might take some time)</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>)
+<span class='co'># Compute the statistics.</span>
+<span class='no'>DE_mt</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='mt_diffexprs.html'>mt_diffexprs</a></span>(<span class='no'>example_mmt</span>,
+  <span class='kw'>group</span>      <span class='kw'>=</span> <span class='st'>"Type"</span>,
+  <span class='kw'>row_labels</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"GeneID"</span>,<span class='st'>"product"</span>),
+  <span class='kw'>intercept</span>  <span class='kw'>=</span> <span class='st'>"ANAMMOX"</span>)
 
-<span class='co'># Plot replicates and relabel.</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>,<span class='kw'>samples</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"HQ180323_13"</span>,<span class='st'>"HQ180323_14"</span>),<span class='kw'>label_by</span> <span class='kw'>=</span> <span class='st'>"Replicate"</span>)
+<span class='co'># Extract results for given levels.</span>
+<span class='no'>mt_res</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_dumpDE</span>(<span class='no'>DE_mt</span>,<span class='kw'>nom</span> <span class='kw'>=</span> <span class='st'>"ELECTRODE"</span>,<span class='kw'>denom</span> <span class='kw'>=</span> <span class='st'>"SUSPENTION"</span>)
+
+<span class='co'># Show the output.</span>
+<span class='no'>mt_res</span>$<span class='no'>MAplot</span>
+<span class='no'>mt_res</span>$<span class='no'>BOXplot</span>
+<span class='fu'>head</span>(<span class='no'>mt_res</span>$<span class='no'>Table</span>)
 <span class='co'># }</span><div class='input'>
 </div></pre>
   </div>
@@ -154,6 +191,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

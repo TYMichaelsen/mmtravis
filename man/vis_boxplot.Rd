@@ -2,7 +2,7 @@
 % Please edit documentation in R/vis_boxplot.R
 \name{vis_boxplot}
 \alias{vis_boxplot}
-\title{Boxplot}
+\title{Visually appealing boxplots}
 \usage{
 vis_boxplot(obj,group_by)
 }
@@ -61,7 +61,7 @@ vis_boxplot(obj,group_by)
 A ggplot2 object. If \code{detailed_output = TRUE} a list with a ggplot2 object and additional data.
 }
 \description{
-Generates boxplots of genes/OTUs.
+Boxplot
 }
 \details{
 The plot is ordered as one would read a book, from left to right and top to bottom.

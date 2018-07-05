@@ -2,7 +2,7 @@
 % Please edit documentation in R/vis_ordinate.R
 \name{vis_ordinate}
 \alias{vis_ordinate}
-\title{Ordination plot}
+\title{Visually appealing ordination plots}
 \usage{
 vis_ordinate(data, type = "", transform = "", distmeasure = "", constrain = "")
 }
@@ -118,9 +118,12 @@ You can also write your own math formula, see details in \code{\link[vegan]{vegd
 A ggplot2 object. If \code{detailed_output = TRUE} a list with a ggplot2 object and additional data.
 }
 \description{
-A wrapper around the vegan package to generate ggplot2 ordination plots suited for analysis and comparison of microbial communities. Simply choose an ordination type and a plot is returned.
+Ordination plot
 }
 \details{
+A wrapper around the vegan package to generate ggplot2 ordination plots suited for analysis and comparison of microbial communities. Simply choose an ordination type and a plot is returned.
+
+
 The \code{\code{vis_ordinate}} function is primarily based on two packages; \code{\link[vegan]{vegan-package}}, which performs the actual ordination, and the \code{\link[ggplot2]{ggplot2-package}} to generate the plot. The function generates an ordination plot by the following process:
 \enumerate{
   \item Various input argument checks and error messages

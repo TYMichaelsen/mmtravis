@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs • mmtravis</title>
+<title>Calculate differential expression statistics by a grouping variable. — mt_diffexprs • mmtravis</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs" />
+<meta property="og:title" content="Calculate differential expression statistics by a grouping variable. — mt_diffexprs" />
 
-<meta property="og:description" content="Plots the gene expression from multiple samples in a mmt object in a grid plot with all pairs of variables." />
+<meta property="og:description" content="mt_diffexprs" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,59 +92,80 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot multiple combinations of sample gene expressions in a pairs plot</h1>
+    <h1>Calculate differential expression statistics by a grouping variable.</h1>
     
-    <div class="hidden name"><code>mt_plotpairs.Rd</code></div>
+    <div class="hidden name"><code>mt_diffexprs.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Plots the gene expression from multiple samples in a <code>mmt</code> object in a grid plot with all pairs of variables.</p>
+    <p>mt_diffexprs</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_plotpairs</span>(<span class='no'>mmt</span>, <span class='kw'>samples</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>label_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>textsize</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>pointsize</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
+    <pre class="usage"><span class='fu'>mt_diffexprs</span>(<span class='no'>obj</span>,<span class='no'>group</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mmt</th>
-      <td><p>(<em>required</em>) A <code>mmt</code> list loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
+      <th>obj</th>
+      <td><p>(<em>required</em>) An object of class 'mmt' (see <code><a href='mt_load.html'>mt_load</a></code>) or 'ampvis2' (see <code>amp_load</code>).</p></td>
     </tr>
     <tr>
-      <th>samples</th>
-      <td><p>A vector of 3 or more sample names in <code>mmt</code> to plot on each axis. If NULL, the default, then all samples will be plotted. (<em>Default: </em> <code>NULL</code>)</p></td>
+      <th>group</th>
+      <td><p>(<em>required</em>) Character string defining the grouping variable to use for differential expression.</p></td>
     </tr>
     <tr>
-      <th>label_by</th>
-      <td><p>replace the SampleIDs plotted in the diagonal with one(!) column in the metadata.</p></td>
+      <th>intercept</th>
+      <td><p>(<em>optional</em>) Specify the level of 'group' to be used as reference/intercept. Default is by alphabetical order.</p></td>
     </tr>
     <tr>
-      <th>textsize</th>
-      <td><p>The text size of the axis titles.</p></td>
+      <th>row_labels</th>
+      <td><p>(<em>optional</em>) Specify columns of rowdata to print on heatmap.</p></td>
     </tr>
     <tr>
-      <th>pointsize</th>
-      <td><p>The size of points in the plot.</p></td>
+      <th>order_var_by</th>
+      <td><p>(<em>optional</em>) How to order rows of heatmap. You can specify 1) "variance" or 2) one of the levels in <code>group</code>, which will order according to the absolute value of that level. (<em>default</em>: "variance")</p></td>
+    </tr>
+    <tr>
+      <th>row_show</th>
+      <td><p>(<em>optional</em>) The number of rows to show.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot2 object.</p>
+    <p>A list with 2 elements:</p>
+<ul>
+<li><p><strong>heatmap</strong> - A heatmap showing the log fold-change of each level in <code>group</code> relative to the intercept/baseline level specified in <code>intercept</code>. The <code>intercept</code> is therefore not possible to plot.</p></li>
+<li><p><strong>DESeq</strong> - A DESeqDataSet containing the results of the differential expression analysis. To extract results and do comparisons between groups use the <code><a href='mt_dumpDE.html'>mt_dumpDE</a></code> function.</p></li>
+</ul>
+
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Typically one would subset low-expression genes (use <code><a href='mt_subset.html'>mt_subset</a></code>) before performing the analysis, due to a low signal/noise ratio. This also drastically reduces computation times and improves stability of the parameter estimation.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><span class='co'># NOT RUN {</span>
+<span class='co'># Load data.</span>
 <span class='fu'>data</span>(<span class='st'>"example_mmt"</span>)
 
-<span class='co'># Plot all samples (might take some time)</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>)
+<span class='co'># Compute the statistics.</span>
+<span class='no'>DE_mt</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_diffexprs</span>(<span class='no'>example_mmt</span>,
+  <span class='kw'>group</span>      <span class='kw'>=</span> <span class='st'>"Type"</span>,
+  <span class='kw'>row_labels</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"GeneID"</span>,<span class='st'>"product"</span>),
+  <span class='kw'>intercept</span>  <span class='kw'>=</span> <span class='st'>"ANAMMOX"</span>)
 
-<span class='co'># Plot replicates and relabel.</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>,<span class='kw'>samples</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"HQ180323_13"</span>,<span class='st'>"HQ180323_14"</span>),<span class='kw'>label_by</span> <span class='kw'>=</span> <span class='st'>"Replicate"</span>)
+<span class='co'># Extract results for given levels.</span>
+<span class='no'>mt_res</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='mt_dumpDE.html'>mt_dumpDE</a></span>(<span class='no'>DE_mt</span>,<span class='kw'>nom</span> <span class='kw'>=</span> <span class='st'>"ELECTRODE"</span>,<span class='kw'>denom</span> <span class='kw'>=</span> <span class='st'>"SUSPENTION"</span>)
+
+<span class='co'># Show the output.</span>
+<span class='no'>mt_res</span>$<span class='no'>MAplot</span>
+<span class='no'>mt_res</span>$<span class='no'>BOXplot</span>
+<span class='fu'>head</span>(<span class='no'>mt_res</span>$<span class='no'>Table</span>)
 <span class='co'># }</span><div class='input'>
 </div></pre>
   </div>
@@ -154,6 +175,8 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>

@@ -2,9 +2,9 @@
 % Please edit documentation in R/mt_loadMetaT.R
 \name{mt_loadMetaT}
 \alias{mt_loadMetaT}
-\title{mt_loadMetaT}
+\title{Load data produced by the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline into R.}
 \usage{
-mt_loadMetaT(counts.txt, seqstat.txt, mtmeta = NULL)
+mt_loadMetaT(counts.txt,seqstat.txt,mtmeta = NULL)
 }
 \arguments{
 \item{counts.txt}{(\emph{required}) The count table as outputted from the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline}
@@ -17,7 +17,7 @@ mt_loadMetaT(counts.txt, seqstat.txt, mtmeta = NULL)
 A \code{mmt} object.
 }
 \description{
-This function loads the data outputted from the MetaT pipeline into an mmt object.
+mt_loadMetaT
 }
 \details{
 This function is a wrapper to transform .txt files outputted from the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline into R.

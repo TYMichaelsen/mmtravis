@@ -2,7 +2,7 @@
 % Please edit documentation in R/mt_dumpDE.R
 \name{mt_dumpDE}
 \alias{mt_dumpDE}
-\title{mt_dumpDE}
+\title{Extract results from DE analysis done using \code{mt_diffexprs}.}
 \usage{
 mt_dumpDE(mmtDE,nom,denom)
 }

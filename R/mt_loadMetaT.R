@@ -1,6 +1,8 @@
 #' mt_loadMetaT
 #'
-#' This function loads the data outputted from the MetaT pipeline into an mmt object.
+#' @title Load data produced by the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline into R.
+#'
+#' @usage mt_loadMetaT(counts.txt,seqstat.txt,mtmeta = NULL)
 #'
 #' @param counts.txt (\emph{required}) The count table as outputted from the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline
 #' @param seqstat.txt (\emph{required}) The seqstat table as outputted from the \href{https://github.com/TYMichaelsen/MetaT}{MetaT} pipeline

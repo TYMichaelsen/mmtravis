@@ -2,7 +2,7 @@
 % Please edit documentation in R/mt_subset.R
 \name{mt_subset}
 \alias{mt_subset}
-\title{Subset mt objects based on sample metadata}
+\title{Normalise and subset the data in \code{mmt} objects based on variable/sample metadata.}
 \usage{
 mt_subset(data, ...)
 }
@@ -26,7 +26,7 @@ mt_subset(data, ...)
 A modifed mt object
 }
 \description{
-Subsets the data in ampvis2 objects based on metadata and returns the subsetted object.
+Subset mt objects based on sample metadata
 }
 \details{
 The subset is performed on the mtmeta/mtgene data by \code{subset()} and the whole object is then adjusted accordingly.

@@ -1,6 +1,6 @@
 #' Boxplot
 #'
-#' Generates boxplots of genes/OTUs.
+#' @title Visually appealing boxplots
 #'
 #' @usage vis_boxplot(obj,group_by)
 #'

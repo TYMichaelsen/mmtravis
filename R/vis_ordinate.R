@@ -2,6 +2,8 @@
 #'
 #' A wrapper around the vegan package to generate ggplot2 ordination plots suited for analysis and comparison of microbial communities. Simply choose an ordination type and a plot is returned.
 #'
+#' @title Visually appealing ordination plots
+#'
 #' @usage vis_ordinate(data, type = "", transform = "", distmeasure = "", constrain = "")
 #'
 #' @param obj (\emph{required}) A data object of class 'ampvis2' (see \href{https://github.com/MadsAlbertsen/ampvis2}{amp_load}) or class 'mmt' (see \code{\link{mt_load}}).

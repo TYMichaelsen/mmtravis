@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>mt_load — mt_load • mmtravis</title>
+<title>Load the transcriptomics data, associated gene data and metadata. — mt_load • mmtravis</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="mt_load — mt_load" />
+<meta property="og:title" content="Load the transcriptomics data, associated gene data and metadata. — mt_load" />
 
-<meta property="og:description" content="This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtranscriptome functions. It is therefore required to load data with mt_load before any other mmtranscriptome functions can be used." />
+<meta property="og:description" content="mt_load" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -61,7 +61,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mmtravis</a>
-        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">0.1.0</span>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">1.1.1</span>
       </span>
     </div>
 
@@ -92,25 +92,25 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>mt_load</h1>
+    <h1>Load the transcriptomics data, associated gene data and metadata.</h1>
     
     <div class="hidden name"><code>mt_load.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>This function reads gene expression data, associated annotation and metadata, and returns a list for use in all mmtranscriptome functions. It is therefore required to load data with <code>mt_load</code> before any other mmtranscriptome functions can be used.</p>
+    <p>mt_load</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_load</span>(<span class='no'>mtcount</span>, <span class='kw'>mtgene</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mtmeta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>mtstat</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+    <pre class="usage"><span class='fu'>mt_load</span>(<span class='no'>mtdata</span>,<span class='kw'>mtgene</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,<span class='kw'>mtmeta</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mtcount</th>
-      <td><p>(<em>required</em>) data.frame with read counts.</p></td>
+      <th>mtdata</th>
+      <td><p>(<em>required</em>) data.frame with read expressions.</p></td>
     </tr>
     <tr>
       <th>mtgene</th>
@@ -120,38 +120,34 @@
       <th>mtmeta</th>
       <td><p>(<em>optional</em>) data.frame with metadata associated to samples (columns).</p></td>
     </tr>
-    <tr>
-      <th>mtstat</th>
-      <td><p>(<em>optional</em>) data.frame with sequencing stats associated to samples (columns).</p></td>
-    </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A list of class <code>"mt"</code> with 3 to 4 elements.</p>
+    <p>A list of class <code>"mt"</code> with 3 elements.</p>
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The <code>mt_load</code> function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.</p>
     
-    <h2 class="hasAnchor" id="the-mtcount"><a class="anchor" href="#the-mtcount"></a>The mtcount</h2>
+    <h2 class="hasAnchor" id="the-mtdata"><a class="anchor" href="#the-mtdata"></a>The mtdata</h2>
 
     
-    <p>The mtcount-table contains read counts for all genes in each sample. The provided mtcount-table must be a data frame with the following requirements:</p>
+    <p>The mtdata-table contains read expressions for all genes in each sample. The provided mtdata-table must be a data frame with the following requirements:</p>
 <ul>
 <li><p>The rows are gene IDs and the columns are samples.</p></li>
 <li><p>The gene ID's are expected to be in eiher the rownames of the data frame or in a column called "ID". Otherwise the function will stop with a message.</p></li>
 <li><p>The column names of the data frame are the sample IDs, exactly matching those in the metadata.</p></li>
 <li><p>Generally avoid special characters and spaces in row- and column names.</p></li>
 </ul>
-    <p>A minimal example is available with <code>data("example_mtcount")</code>.</p>
+    <p>A minimal example is available with <code>data("example_mtdata")</code>.</p>
     
     <h2 class="hasAnchor" id="the-mtgene"><a class="anchor" href="#the-mtgene"></a>The mtgene</h2>
 
     
     <p>The mtgene-table contains additional information about the genes, for example reference database ID's, product, and function, which can be used during analysis. The amount of information in the mtgene-table is unlimited, it can contain any number of columns (variables), however there are a few requirements:</p>
 <ul>
-<li><p>The gene IDs must be in the first column. These must match exactly to those in the mtcount-table.</p></li>
+<li><p>The gene IDs must be in the first column. These must match exactly to those in the mtdata-table.</p></li>
 <li><p>Column classes matter, categorical variables should be loaded either <code>as.character()</code> or <code>as.factor()</code>, and continuous variables <code>as.numeric()</code>. See below.</p></li>
 <li><p>Generally avoid special characters and spaces in row- and column names.</p></li>
 </ul>
@@ -163,7 +159,7 @@
     
     <p>The mtmeta-table contains additional information about the samples, for example where each sample was taken, date, pH, treatment etc, which is used to compare and group the samples during analysis. The amount of information in the mtmeta-table is unlimited, it can contain any number of columns (variables), however there are a few requirements:</p>
 <ul>
-<li><p>The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtcount-table.</p></li>
+<li><p>The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtdata-table.</p></li>
 <li><p>Column classes matter, categorical variables should be loaded either <code>as.character()</code> or <code>as.factor()</code>, and continuous variables <code>as.numeric()</code>. See below.</p></li>
 <li><p>Generally avoid special characters and spaces in row- and column names.</p></li>
 </ul>
@@ -171,22 +167,22 @@
 <p>The <code>mt_load</code> function will automatically use the sample IDs in the first column as rownames, but it is important to also have an actual column with sample IDs, so it is possible to fx group by that column during analysis. Any unmatched samples between the otutable and metadata will be removed.</p>
 <p>A minimal example is available with <code>data("example_mtmeta")</code>.</p>
     
-    <h2 class="hasAnchor" id="the-mtstat"><a class="anchor" href="#the-mtstat"></a>The mtstat</h2>
-
-    
-    <p>The mtstat-table contains sequencing statistics for the samples, and must comply to the following requirements:</p>
-<ul>
-<li><p>The sample IDs must be in the first column. These sample IDs must match exactly to those in the mtcount-table.</p></li>
-<li><p>A column named "Raw", with the raw number of sequences before QC and filtering.</p></li>
-<li><p>A column named "QC", with the number of sequences after QC.</p></li>
-<li><p>A column named "filtered", with the number of sequences after additional removal of rRNA.</p></li>
-</ul>
-    <p>The mtstat-table is used for QC assesment.</p>
-<p>A minimal example is available with <code>data("example_mtstat")</code>.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='no'>This</span></div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): objekt 'This' blev ikke fundet</span></div></pre>
+    <pre class="examples"><div class='input'>
+</div><span class='co'># NOT RUN {</span>
+<span class='co'># Load the different components.</span>
+<span class='fu'>data</span>(<span class='st'>"example_mtmeta"</span>)
+<span class='fu'>data</span>(<span class='st'>"example_mtgene"</span>)
+<span class='fu'>data</span>(<span class='st'>"example_mtdata"</span>)
+
+<span class='co'># Combine in one object of class 'mmt'.</span>
+<span class='no'>mt</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_load</span>(<span class='kw'>mtdata</span> <span class='kw'>=</span> <span class='no'>example_mtdata</span>,<span class='kw'>mtgene</span> <span class='kw'>=</span> <span class='no'>example_mtgene</span>,<span class='kw'>mtmeta</span> <span class='kw'>=</span> <span class='no'>example_mtmeta</span>)
+
+<span class='co'>#Show a short summary about the data by simply typing the name of the object in the console</span>
+<span class='no'>mt</span>
+<span class='co'># }</span><div class='input'>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -197,13 +193,11 @@
 
       <li><a href="#details">Details</a></li>
 
-      <li><a href="#the-mtcount">The mtcount</a></li>
+      <li><a href="#the-mtdata">The mtdata</a></li>
 
       <li><a href="#the-mtgene">The mtgene</a></li>
 
       <li><a href="#the-mtmeta">The mtmeta</a></li>
-
-      <li><a href="#the-mtstat">The mtstat</a></li>
       
       <li><a href="#examples">Examples</a></li>
     </ul>
