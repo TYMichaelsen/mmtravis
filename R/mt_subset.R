@@ -4,26 +4,38 @@
 #'
 #' @usage mt_subset(data, ...)
 #'
-#' @param mt (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
-#' @param sub_genes (\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \code{subset()}.
-#' @param sub_samples (\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \code{subset()}.
-#' @param minreads Minimum number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})
-#' @param normalise Transform the read counts AFTER reads have been removed by the minreads argument. (\emph{default:} \code{"none"})
+#' @param mmt (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
+#' @param sub_genes (\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \link[base]{subset}.
+#' @param sub_samples (\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \link[base]{subset}.
+#' @param minreads Minimum average number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})
+#' @param frac0 Fraction of zeros allowed per gene. Genes with a higher fraction of zeros will be removed. (\emph{default:} \code{1})
+#' @param normalise Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (\emph{default:} \code{"none"})
 #' \itemize{
+#'    \item \code{"quantile"}: Quantile normalization. See \link[preprocessCore]{normalize.quantiles} for details.
 #'    \item \code{"total"}: Normalise the read counts to be in percent per sample.
 #'    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
+#'    \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
+#'    \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.
 #'    \item \code{"none"}: No normalisation.
 #'    }
 #'
 #' @return A modifed mt object
 #'
+#' @importFrom preprocessCore normalize.quantiles
 #' @importFrom DESeq2 estimateSizeFactorsForMatrix
 #' @importFrom magrittr %>%
 #' @importFrom dplyr filter
 #'
 #' @export
 #'
-#' @details The subset is performed on the mtmeta/mtgene data by \code{subset()} and the whole object is then adjusted accordingly.
+#' @details The function \code{\link{mt_subset}} operates in three steps:
+#' \itemize{
+#'    \item \strong{Filter} - genes according to \code{minreads} and \code{frac0}.
+#'    \item \strong{Normalise} - as specified in \code{normalise}.
+#'    \item \strong{Subset} - according to \code{sub_genes} and \code{sub_samples}.
+#' }
+#'
+#' Subsetting are performed on the mtmeta/mtgene data by \link[base]{subset} and the whole object is then adjusted accordingly.
 #'
 #' @examples
 #'
@@ -57,34 +69,57 @@
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
 
-mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,normalise = "none"){
+mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0 = 1,normalise = "none"){
 
   #For printing removed samples and OTUs
   nsamplesbefore <- nrow(mmt$mtmeta) %>% as.numeric()
   ngenesbefore   <- nrow(mmt$mtdata) %>% as.numeric()
 
-  # remove genes below minreads.
-  wh <- rowSums(mmt$mtdata[,-1]) >= minreads
-  mmt$mtdata <- mmt$mtdata[wh,,drop = F]
-  mmt$mtgene  <- if(!is.null(mmt$mtgene)) mmt$mtgene <- mmt$mtgene[wh,,drop = F]
+  ##### FILTERING #####
+  # remove genes below minreads and more than frac0 zeros.
+  if (frac0 < 0 | frac0 > 1) stop("'frac0' has to be between [0,1]",call. = FALSE)
+  wh <- mmt$mtdata[,-1] %>% {
+    rowSums(.) >= minreads &
+    apply(.,1,function(x){sum(x == 0,na.rm = T)})/ncol(.) <= frac0}
 
+  #DT[,Sum := lapply(.SD,sum),.SDcols = colnames(DT)[-1]][Sum >= minreads]
+
+  mmt$mtdata <- mmt$mtdata[wh,,drop = F]
+  if(!is.null(mmt$mtgene)) mmt$mtgene <- mmt$mtgene[wh,,drop = F]
+
+  ##### NORMALISE #####
   if(normalise != "none"){
+    if(!is.null(attributes(mmt)$normalised)){
+      stop("The data has allready been normalised.",call. = FALSE)
+    }
     attributes(mmt)$normalised <- normalise
 
     # Normalise data.
-    if (normalise == "total"){
+    if (normalise == "quantile"){
+      mmt$mtdata[,-1] <- preprocessCore::normalize.quantiles(as.matrix(mmt$mtdata[,-1]))
+    } else if (normalise == "total"){
       mmt$mtdata[,-1] <- as.data.frame(apply(mmt$mtdata[,-1, drop = FALSE],
                           2, function(x) x/sum(x) * 100))
-    } else if (normalise == "libsize") {
-      mmt$mtdata[,-1] <- mmt$mtdata[,-1] %>%
+    } else if (normalise %in% c("libsize","vst","log2")) {
+      x_norm <- mmt$mtdata[,-1] %>%
         as.matrix() %>%
         {t(t(.)/DESeq2::estimateSizeFactorsForMatrix(.))} %>%
         as.data.frame()
+      if (normalise == "vst"){
+        mmt$mtdata[,-1] <- suppressMessages(mmt$mtdata[,-1] %>%
+          as.matrix() %>%
+          vst())
+      } else if (normalise == "log2"){
+        mmt$mtdata[,-1] <- log2(x_norm + 1)
+      } else {
+        mmt$mtdata[,-1] <- x_norm
+      }
     } else {
       stop("normalise: please specify a valid argument.",call. = FALSE)
     }
   }
 
+  ##### SUBSET #####
   # Subset samples.
   if (!is.null(sub_samples)){
     wh <- tryCatch(expr = {

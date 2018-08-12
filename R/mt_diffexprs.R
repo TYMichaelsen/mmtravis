@@ -86,8 +86,6 @@ mt_diffexprs <- function(obj,group,
   }
 
   ##### Input checking #####
-  "%w/o%" <- function(x, y) x[!x %in% y]
-
   if(!(group %in% colnames(meta)))
     stop(paste0("group '",group,"' is not in metadata."))
 

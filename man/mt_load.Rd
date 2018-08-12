@@ -7,11 +7,11 @@
 mt_load(mtdata,mtgene = NULL,mtmeta = NULL)
 }
 \arguments{
-\item{mtdata}{(\emph{required}) data.frame with read expressions.}
+\item{mtdata}{(\emph{required}) data.table with read expressions.}
 
-\item{mtgene}{(\emph{optional}) data.frame with metadata associated to genes (rows).}
+\item{mtgene}{(\emph{optional}) data.table with metadata associated to genes (rows).}
 
-\item{mtmeta}{(\emph{optional}) data.frame with metadata associated to samples (columns).}
+\item{mtmeta}{(\emph{optional}) data.table with metadata associated to samples (columns).}
 }
 \value{
 A list of class \code{"mt"} with 3 elements.
@@ -20,7 +20,10 @@ A list of class \code{"mt"} with 3 elements.
 mt_load
 }
 \details{
-The \code{\link{mt_load}} function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.
+If objects of class \code{data.frame} are provided they will be coerced
+into \code{data.table}. The data structure remains unchanged in most cases,
+however it is recomended to have the data in \code{data.table} format before
+loading it.
 }
 \section{The mtdata}{
 

@@ -4,19 +4,23 @@
 #'
 #' @usage mt_load(mtdata,mtgene = NULL,mtmeta = NULL)
 #'
-#' @param mtdata (\emph{required}) data.frame with read expressions.
-#' @param mtgene  (\emph{optional}) data.frame with metadata associated to genes (rows).
-#' @param mtmeta  (\emph{optional}) data.frame with metadata associated to samples (columns).
+#' @param mtdata (\emph{required}) data.table with read expressions.
+#' @param mtgene  (\emph{optional}) data.table with metadata associated to genes (rows).
+#' @param mtmeta  (\emph{optional}) data.table with metadata associated to samples (columns).
 #'
 #' @return A list of class \code{"mt"} with 3 elements.
 #'
 #' @importFrom magrittr %>%
+#' @importFrom data.table setcolorder data.table setnames
 #' @importFrom dplyr rename
 #' @importFrom stringr str_replace_all
 #'
 #' @export
 #'
-#' @details The \code{\link{mt_load}} function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.
+#' @details If objects of class \code{data.frame} are provided they will be coerced
+#' into \code{data.table}. The data structure remains unchanged in most cases,
+#' however it is recomended to have the data in \code{data.table} format before
+#' loading it.
 #'
 #' @section The mtdata:
 #' The mtdata-table contains read expressions for all genes in each sample. The provided mtdata-table must be a data frame with the following requirements:
@@ -76,62 +80,72 @@
 #' @author Thomas Yssing Michaelsen \email{tym@bio.aau.dk}
 
 mt_load <- function(mtdata,mtgene = NULL,mtmeta = NULL){
+
   ### CHECK INPUT DATA ###
   # Generate meta data if needed.
   if (is.null(mtmeta)){
-    mtmeta <- data.frame(
+    mtmeta <- data.table(
       SampleID = colnames(mtdata[,-1]))
     warning("No sample metadata provided, creating dummy metadata.\n", call. = FALSE)
-  }
-  # Generate gene data if needed.
-  if (is.null(mtgene)){
-    mtgene <- data.frame(
-      GeneID = mtdata[,1])
-    warning("No gene data provided, creating dummy genedata.\n", call. = FALSE)
+  } else {
+    mtmeta <- data.table(mtmeta)
   }
 
+  # Generate gene data if needed.
+  if (is.null(mtgene)){
+    mtgene <- data.table(
+      GeneID = mtdata[,1])
+    warning("No gene data provided, creating dummy genedata.\n", call. = FALSE)
+  } else {
+    mtgene <- data.table(mtgene)
+  }
+
+  # Set mtdata to correct class.
+  mtdata <- data.table(mtdata)
+
   ### CORRECT NAMING ###
-  colnames(mtdata) <- stringr::str_replace_all(colnames(mtdata), "[^[:alnum:]]", "_")
-  colnames(mtmeta)  <- stringr::str_replace_all(colnames(mtmeta), "[^[:alnum:]]", "_")
-  colnames(mtgene)  <- stringr::str_replace_all(colnames(mtgene), "[^[:alnum:]]", "_")
-  mtmeta[,1]        <- stringr::str_replace_all(mtmeta[,1], "[^[:alnum:]]", "_")
+  setnames(mtdata,old = colnames(mtdata),new = stringr::str_replace_all(colnames(mtdata), "[^[:alnum:]]", "_"))
+  setnames(mtmeta,old = colnames(mtmeta),new = stringr::str_replace_all(colnames(mtmeta), "[^[:alnum:]]", "_"))
+  setnames(mtgene,old = colnames(mtgene),new = stringr::str_replace_all(colnames(mtgene), "[^[:alnum:]]", "_"))
+  mtmeta[,1] <- stringr::str_replace_all(mtmeta[[1]], "[^[:alnum:]]", "_")
 
   ### ENSURE CORRECT NAMING ESSENTIAL COLUMNS ###
   # mtdata
   i <- which(colnames(mtdata) == "GeneID")[1]
   if (!is.na(i) & i != 1){
-    mtmeta <- dplyr::rename(mtdata,GeneID_1 = GeneID)
-    colnames(mtdata)[1] <- "GeneID"
+    setnames(mtdata,old = "GeneID",new = "GeneID_1")
+    setnames(mtdata,old = 1,new = "GeneID")
     message("You had a column named 'GeneID' in mtdata which wasn't the first column. Renaming it to 'GeneID_1' to avoid conflicts.")
   } else {
-    colnames(mtdata)[1] <- "GeneID"
+    setnames(mtdata,old = 1,new = "GeneID")
   }
   # mtmeta
   i <- which(colnames(mtmeta) == "SampleID")[1]
   if (!is.na(i) & i != 1){
-    mtmeta <- dplyr::rename(mtmeta,SampleID_1 = SampleID)
-    colnames(mtmeta)[1] <- "SampleID"
+    setnames(mtmeta,old = "SampleID",new = "SampleID_1")
+    setnames(mtmeta,old = 1,new = "SampleID")
     message("You had a column named 'SampleID' in mtmeta which wasn't the first column. Renaming it to 'SampleID_1' to avoid conflicts.")
   } else {
-    colnames(mtmeta)[1] <- "SampleID"
+    setnames(mtmeta,old = 1,new = "SampleID")
   }
   # mtgene
   i <- which(colnames(mtgene) == "GeneID")[1]
   if (!is.na(i) & i != 1){
-    colnames(mtgene)[1] <- "GeneID"
+    setnames(mtgene,old = "GeneID",new = "GeneID_1")
+    setnames(mtgene,old = 1,new = "GeneID")
     message("You had a column named 'GeneID' in mtgene which wasn't the first column. Renaming it to 'GeneID_1' to avoid conflicts.")
   } else {
-    colnames(mtgene)[1] <- "GeneID"
+    setnames(mtgene,old = 1,new = "GeneID")
   }
 
   ### CHECK THAT THINGS WENT WELL ###
   # Check consistent sample names.
-  i <- setequal(colnames(mtdata[,-1]),mtmeta[,1])
+  i <- setequal(colnames(mtdata[,-1,drop = F]),mtmeta[[1]])
   if ( !i ){
     stop("Sample names are not matching 1:1 or misspecified in 'mtdata' and/or 'mtmeta'. Please read the documentation.")
   }
   # Check consistent gene names.
-  i <- setequal(mtgene[,1],mtdata[,1])
+  i <- setequal(mtgene[[1]],mtdata[[1]])
   if ( !i ){
     stop("Gene names are not matching 1:1 or misspecified in 'mtdata' and/or 'mtgene'. Please read the documentation.")
   }
@@ -139,11 +153,16 @@ mt_load <- function(mtdata,mtgene = NULL,mtmeta = NULL){
   ### DUMP OUTPUT ###
   sampOrd <- as.character(mtmeta$SampleID)
 
-  mtdata <- mtdata[,c(1,1+match(sampOrd,colnames(mtdata)[-1])),drop = F]
-  mtmeta <- mtmeta[match(sampOrd,mtmeta$SampleID),,drop = F]
-  mtgene <- mtgene[match(mtdata$GeneID,mtgene$GeneID),,drop = F]
+  setcolorder(mtdata,neworder = c(1,1+match(sampOrd,colnames(mtdata)[-1])))
+  setroworder(mtmeta,neworder = match(sampOrd,mtmeta$SampleID))
+  setroworder(mtgene,neworder = match(mtdata$GeneID,mtgene$GeneID))
 
-  out <- list(mtdata = mtdata,mtgene = mtgene,mtmeta = mtmeta)
+  out <- list(
+    mtdata = as.data.frame(mtdata,stringsAsFactors = F),
+    mtgene = as.data.frame(mtgene,stringsAsFactors = F),
+    mtmeta = as.data.frame(mtmeta,stringsAsFactors = F))
+
   class(out) <- "mmt"
   return(out)
 }
+

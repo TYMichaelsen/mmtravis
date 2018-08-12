@@ -1,3 +1,7 @@
+#' x without y
+#'
+"%w/o%" <- function(x, y) x[!x %in% y]
+
 #' Prints mmt object summary (internal function)
 #'
 #' @param obj (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
@@ -7,6 +11,7 @@
 #' @export
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
 print.mmt <- function(obj){
+
   # Calculate row- and columnwise stats.
   genesum <- obj$mtdata[,-1] %>% as.matrix() %>%
     base::rowSums(.) %>%
@@ -36,6 +41,66 @@ print.mmt <- function(obj){
     cat(crayon::underline("Normalised:\n"),
         paste0("Data is normalised by '",attributes(obj)$normalised,"'. See documentation for details.\n"))
   }
+  if (!is.null(attributes(obj)$batch)){
+    cat(crayon::underline("Batch-correction:\n"),
+        paste0("Data is batch-corrected by variable '",attributes(obj)$batch$Var,"', using '",attributes(obj)$batch$method,"'. See documentation for details.\n"))
+  }
+}
+
+#' Gather the mmt object into one dataframe, suitable for e.g. ggplot or custom analysis (internal function)
+#'
+#' @param mmt (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
+#' @param metavars (\emph{optional}) Columns from mtgene/mtmeta to keep. (\emph{default:} \code{NULL} (all columns))
+#'
+#' @importFrom dplyr inner_join one_of select everything
+#' @importFrom data.table melt
+#' @importFrom tidyr gather
+#'
+#' @return A data.table in long format. The gene count/expression is stored in the \code{Exprs} column.
+#' @export
+#'
+#' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
+mt_gather <- function(mmt,metavars = NULL){
+  samps <- colnames(mmt$mtdata)[-1]
+
+  # Join the mtgene and mtdata.
+  gdat <- inner_join(mmt$mtgene,mmt$mtdata,by = "GeneID") %>%
+    data.table() %>%
+  {data.table::melt(.,
+    id.vars       = colnames(.) %w/o% samps,
+    measure.vars  = samps,
+    value.name    = "Exprs",
+    variable.name = "SampleID")}
+
+  # Join with mtmeta.
+  gdat <- data.table:::merge.data.table(data.table(mmt$mtmeta),gdat,by = "SampleID")
+
+  # Keep only 'metavars'.
+  if(!is.null(metavars)){
+    if(all(metavars %in% colnames(gdat))){
+      metavars <- metavars %w/o% c("SampleID","GeneID")
+      gdat <- select(gdat,SampleID,GeneID,Exprs,one_of(metavars))
+    } else {
+      stop("'metavars' must be valid column names from either mtgene or mtmeta.",call. = FALSE)
+    }
+  } else {
+    gdat <- select(gdat,SampleID,GeneID,Exprs,everything())
+  }
+}
+#' The row-version of setcolorder in data.table (internal function)
+#'
+#' @param x A \code{data.table}.
+#' @param neworder Numeric vector of the row ordering.
+#'
+#' @import data.table
+#'
+#' @return A data.table
+#' @export
+#'
+#' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
+setroworder <- function(x, neworder) {
+    .Call(data.table:::Creorder, x, as.integer(neworder), PACKAGE = "data.table")
+    invisible(x)
 }
 
 #' #' Generates an object of class 'diffexprs' (internal function)
@@ -138,3 +203,5 @@ print.mmt <- function(obj){
 #'
 #' hest <- de$heatmapData
 #' ko   <- de$.heatmap()
+
+

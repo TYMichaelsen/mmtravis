@@ -29,7 +29,7 @@ tab <- fread(
   header           = T,
   stringsAsFactors = F,
   check.names      = F)
-metaVars <- c("contig","ftype","EC_number","gene","product","locus_tag","function","inference")
+metaVars <- c("Genome","Contig","start","end","strand","contig_len","ftype","gene","EC_number","product","locus_tag","function","inference")
 
 # Prepare the gene data.
 mtgene <- select(tab,1,2) %>%

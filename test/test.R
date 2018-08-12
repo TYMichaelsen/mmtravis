@@ -3,21 +3,53 @@ library(magrittr)
 library(readxl)
 library(tidyverse)
 library(mmtravis)
+library(data.table)
+
+
+tab <- fread(
+  file             = "test/counts.txt",
+  header           = T,
+  stringsAsFactors = F,
+  check.names      = F)
+metaVars <- c("Genome","Contig","start","end","strand","contig_len","ftype","gene","EC_number","product","locus_tag","function","inference")
+
+# Prepare the gene data.
+genedata <- select(tab,1,2) %>%
+  separate(.,
+           col    = 2,
+           into   = metaVars,
+           sep    = "[|]",
+           remove = T) %>%
+  as.data.frame() %>%
+  mutate(length = as.numeric(end) - as.numeric(start))
+
+# Prepare the count table.
+counttab <- select(tab,-2) %>%
+  as.data.frame()
+
+# Metadata.
+metadata  <- read_excel("test/metadata.xlsx") %>%
+  as.data.frame() %>%
+  select(SeqID,everything())
 
 ### Load data.
-mtmeta  <- read_excel("test/metadata.xlsx") %>%
-  as.data.frame() %>%
-  mutate(Samplename = gsub("_SP","",Samplename)) %>%
-  separate(
-    col  = Samplename,
-    into = c("Genus","Replicate","Type"),
-    sep  = "_")
-
 mt <- mt_loadMetaT(counts.txt = "test/counts.txt",seqstat.txt = "test/seqstat.txt",mtmeta = mtmeta)
 
+mt <- mt_load2(mtdata = counttab,mtgene = genedata,mtmeta = metadata)
 ### Test functions. ############################################################
 # Subset.
-mt     <- mt_subset(example_mmt,minreads = 5000,normalise = "total")
+de <- mt_subset2(mt,minreads = 0,frac0 = 1,normalise = "libsize")
+
+mt_subset(mt,sub_genes = "Contig == '1'")
+
+mt_plotpairs(mt,samples = c("HQ180523_13","HQ180523_14"),label_by = "Label",linesize = 2)
+
+hest <- mt_gather(de)
+
+de_bch <- mt_batch(de,batch = "VFA")
+
+
+mt_stackbar(mt,detailed = T)
 
 data("example_mmt")
 

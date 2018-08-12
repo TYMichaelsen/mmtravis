@@ -7,20 +7,25 @@
 mt_subset(data, ...)
 }
 \arguments{
-\item{sub_genes}{(\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \code{subset()}.}
+\item{mmt}{(\emph{required}) Data list as loaded with \code{\link{mt_load}}.}
 
-\item{sub_samples}{(\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \code{subset()}.}
+\item{sub_genes}{(\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \link[base]{subset}.}
 
-\item{minreads}{Minimum number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})}
+\item{sub_samples}{(\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \link[base]{subset}.}
 
-\item{normalise}{Transform the read counts AFTER reads have been removed by the minreads argument. (\emph{default:} \code{"none"})
+\item{minreads}{Minimum average number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})}
+
+\item{frac0}{Fraction of zeros allowed per gene. Genes with a higher fraction of zeros will be removed. (\emph{default:} \code{1})}
+
+\item{normalise}{Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (\emph{default:} \code{"none"})
 \itemize{
+   \item \code{"quantile"}: Quantile normalization. See \link[preprocessCore]{normalize.quantiles} for details.
    \item \code{"total"}: Normalise the read counts to be in percent per sample.
    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
+   \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
+   \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.
    \item \code{"none"}: No normalisation.
    }}
-
-\item{mt}{(\emph{required}) Data list as loaded with \code{\link{mt_load}}.}
 }
 \value{
 A modifed mt object
@@ -29,7 +34,14 @@ A modifed mt object
 Subset mt objects based on sample metadata
 }
 \details{
-The subset is performed on the mtmeta/mtgene data by \code{subset()} and the whole object is then adjusted accordingly.
+The function \code{\link{mt_subset}} operates in three steps:
+\itemize{
+   \item \strong{Filter} - genes according to \code{minreads} and \code{frac0}.
+   \item \strong{Normalise} - as specified in \code{normalise}.
+   \item \strong{Subset} - according to \code{sub_genes} and \code{sub_samples}.
+}
+
+Subsetting are performed on the mtmeta/mtgene data by \link[base]{subset} and the whole object is then adjusted accordingly.
 }
 \examples{
 

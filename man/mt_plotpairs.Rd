@@ -5,7 +5,7 @@
 \title{Plot multiple combinations of sample gene expressions in a pairs plot}
 \usage{
 mt_plotpairs(mmt, samples = NULL, label_by = NULL, textsize = 5,
-  pointsize = 2)
+  linesize = 0.5, pointsize = 2)
 }
 \arguments{
 \item{mmt}{(\emph{required}) A \code{mmt} list loaded with \code{\link{mt_load}}.}
@@ -16,7 +16,9 @@ mt_plotpairs(mmt, samples = NULL, label_by = NULL, textsize = 5,
 
 \item{textsize}{The text size of the axis titles.}
 
-\item{pointsize}{The size of points in the plot.}
+\item{linesize}{The size of lines in the plot(s).}
+
+\item{pointsize}{The size of points in the plot(s).}
 }
 \value{
 A ggplot2 object.

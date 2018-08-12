@@ -4,7 +4,7 @@ output: md_document
 
 # Tools for metatranscriptome analysis
 
-mmtravis is an R-package to conveniently visualise and analyse NGS transcriptomics data in different ways.
+mmtravis is an R-package to conveniently visualise and analyse NGS transcriptomics data in different ways. \strong{NOTE: This is still in development, so don't expect everything to be working perfectly - yet!}
 
 ## Installing mmtravis
 First, install [R (3.4.1 or later)](https://mirrors.dotsrc.org/cran/) and [RStudio](https://www.rstudio.com/products/rstudio/download/#download). Windows users should also install [RTools](https://mirrors.dotsrc.org/cran/bin/windows/Rtools/). Then open RStudio as administrator (!) and run the commands below to install mmtravis from the console:
@@ -15,12 +15,10 @@ remotes::install_github("TYMichaelsen/mmtravis")
 ```
 
 ## Get started
-For a quick guide on how to use mmtravis go to the [Get Started](XXX) page. Detailed documentation of all mmtravis functions can be found at the [Functions](XXX) page.  
+Keep an eye out for or get started page, Comming soon! For now, go to the [References](https://tymichaelsen.github.io/mmtravis/) page to see a list of available functions. 
 
 ## Blog posts about mmtravis
-Check out the blog posts at [http://albertsenlab.org/](http://albertsenlab.org/) about mmtravis:
-
- - [Introducing mmtravis: Our metatranscriptome analysis package](XXX)
+Keep an eye out for upcomming blogposts at [http://albertsenlab.org/](http://albertsenlab.org/) about mmtravis
 
 ## Releases
 To install a specific (older) release of mmtravis use `"@release"` as suffix, fx `remotes::install_github("TYMichaelsen/mmtravis@1.0")` to install the first release (1.0) of mmtravis. The latest stable release can be installed with `remotes::install_github("TYMichaelsen/mmtravis@*release")`.
