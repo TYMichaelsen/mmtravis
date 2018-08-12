@@ -110,15 +110,15 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>mtdata</th>
-      <td><p>(<em>required</em>) data.frame with read expressions.</p></td>
+      <td><p>(<em>required</em>) data.table with read expressions.</p></td>
     </tr>
     <tr>
       <th>mtgene</th>
-      <td><p>(<em>optional</em>) data.frame with metadata associated to genes (rows).</p></td>
+      <td><p>(<em>optional</em>) data.table with metadata associated to genes (rows).</p></td>
     </tr>
     <tr>
       <th>mtmeta</th>
-      <td><p>(<em>optional</em>) data.frame with metadata associated to samples (columns).</p></td>
+      <td><p>(<em>optional</em>) data.table with metadata associated to samples (columns).</p></td>
     </tr>
     </table>
     
@@ -128,7 +128,10 @@
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The <code>mt_load</code> function validates and corrects the provided data frames in different ways to make it suitable for the rest of the mmtranscriptomics workflow. It is important that the provided data frames match the requirements as described in the following sections to work properly.</p>
+    <p>If objects of class <code>data.frame</code> are provided they will be coerced
+into <code>data.table</code>. The data structure remains unchanged in most cases,
+however it is recomended to have the data in <code>data.table</code> format before
+loading it.</p>
     
     <h2 class="hasAnchor" id="the-mtdata"><a class="anchor" href="#the-mtdata"></a>The mtdata</h2>
 

@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs • mmtravis</title>
+<title>The row-version of setcolorder in data.table (internal function) — setroworder • mmtravis</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Plot multiple combinations of sample gene expressions in a pairs plot — mt_plotpairs" />
+<meta property="og:title" content="The row-version of setcolorder in data.table (internal function) — setroworder" />
 
-<meta property="og:description" content="Plots the gene expression from multiple samples in a mmt object in a grid plot with all pairs of variables." />
+<meta property="og:description" content="The row-version of setcolorder in data.table (internal function)" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -92,65 +92,37 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot multiple combinations of sample gene expressions in a pairs plot</h1>
+    <h1>The row-version of setcolorder in data.table (internal function)</h1>
     
-    <div class="hidden name"><code>mt_plotpairs.Rd</code></div>
+    <div class="hidden name"><code>setroworder.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Plots the gene expression from multiple samples in a <code>mmt</code> object in a grid plot with all pairs of variables.</p>
+    <p>The row-version of setcolorder in data.table (internal function)</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_plotpairs</span>(<span class='no'>mmt</span>, <span class='kw'>samples</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>label_by</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>textsize</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>linesize</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>pointsize</span> <span class='kw'>=</span> <span class='fl'>2</span>)</pre>
+    <pre class="usage"><span class='fu'>setroworder</span>(<span class='no'>x</span>, <span class='no'>neworder</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>mmt</th>
-      <td><p>(<em>required</em>) A <code>mmt</code> list loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
+      <th>x</th>
+      <td><p>A <code>data.table</code>.</p></td>
     </tr>
     <tr>
-      <th>samples</th>
-      <td><p>A vector of 3 or more sample names in <code>mmt</code> to plot on each axis. If NULL, the default, then all samples will be plotted. (<em>Default: </em> <code>NULL</code>)</p></td>
-    </tr>
-    <tr>
-      <th>label_by</th>
-      <td><p>replace the SampleIDs plotted in the diagonal with one(!) column in the metadata.</p></td>
-    </tr>
-    <tr>
-      <th>textsize</th>
-      <td><p>The text size of the axis titles.</p></td>
-    </tr>
-    <tr>
-      <th>linesize</th>
-      <td><p>The size of lines in the plot(s).</p></td>
-    </tr>
-    <tr>
-      <th>pointsize</th>
-      <td><p>The size of points in the plot(s).</p></td>
+      <th>neworder</th>
+      <td><p>Numeric vector of the row ordering.</p></td>
     </tr>
     </table>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot2 object.</p>
+    <p>A data.table</p>
     
 
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><span class='co'># NOT RUN {</span>
-<span class='fu'>data</span>(<span class='st'>"example_mmt"</span>)
-
-<span class='co'># Plot all samples (might take some time)</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>)
-
-<span class='co'># Plot replicates and relabel.</span>
-<span class='fu'>mt_plotpairs</span>(<span class='no'>example_mmt</span>,<span class='kw'>samples</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"HQ180323_13"</span>,<span class='st'>"HQ180323_14"</span>),<span class='kw'>label_by</span> <span class='kw'>=</span> <span class='st'>"Replicate"</span>)
-<span class='co'># }</span><div class='input'>
-</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
@@ -158,9 +130,7 @@
       <li><a href="#arguments">Arguments</a></li>
       
       <li><a href="#value">Value</a></li>
-      
-      <li><a href="#examples">Examples</a></li>
-    </ul>
+          </ul>
 
     <h2>Author</h2>
     

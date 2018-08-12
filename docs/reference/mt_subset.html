@@ -109,28 +109,35 @@
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
+      <th>mmt</th>
+      <td><p>(<em>required</em>) Data list as loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
+    </tr>
+    <tr>
       <th>sub_genes</th>
-      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to <code>subset()</code>.</p></td>
+      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to <a href='http://www.rdocumentation.org/packages/base/topics/subset'>subset</a>.</p></td>
     </tr>
     <tr>
       <th>sub_samples</th>
-      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to <code>subset()</code>.</p></td>
+      <td><p>(<em>optional</em>) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to <a href='http://www.rdocumentation.org/packages/base/topics/subset'>subset</a>.</p></td>
     </tr>
     <tr>
       <th>minreads</th>
-      <td><p>Minimum number of reads pr. gene. Genes below this value will be removed. (<em>default:</em> <code>0</code>)</p></td>
+      <td><p>Minimum average number of reads pr. gene. Genes below this value will be removed. (<em>default:</em> <code>0</code>)</p></td>
+    </tr>
+    <tr>
+      <th>frac0</th>
+      <td><p>Fraction of zeros allowed per gene. Genes with a higher fraction of zeros will be removed. (<em>default:</em> <code>1</code>)</p></td>
     </tr>
     <tr>
       <th>normalise</th>
-      <td><p>Transform the read counts AFTER reads have been removed by the minreads argument. (<em>default:</em> <code>"none"</code>)</p><ul>
+      <td><p>Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (<em>default:</em> <code>"none"</code>)</p><ul>
+<li><p><code>"quantile"</code>: Quantile normalization. See <a href='http://www.rdocumentation.org/packages/preprocessCore/topics/normalize.quantiles'>normalize.quantiles</a> for details.</p></li>
 <li><p><code>"total"</code>: Normalise the read counts to be in percent per sample.</p></li>
 <li><p><code>"libsize"</code>: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See <a href='http://www.rdocumentation.org/packages/DESeq2/topics/estimateSizeFactorsForMatrix'>estimateSizeFactorsForMatrix</a> for details.</p></li>
+<li><p><code>"vst"</code>: Normalise as "libsize" and perform robust log2-transformation. See <a href='http://www.rdocumentation.org/packages/DESeq2/topics/vst'>vst</a> for details.</p></li>
+<li><p><code>"log2"</code>: Normalise as "libsize" and perform log2(x + 1)-transformation.</p></li>
 <li><p><code>"none"</code>: No normalisation.</p></li>
 </ul></td>
-    </tr>
-    <tr>
-      <th>mt</th>
-      <td><p>(<em>required</em>) Data list as loaded with <code><a href='mt_load.html'>mt_load</a></code>.</p></td>
     </tr>
     </table>
     
@@ -140,7 +147,12 @@
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>The subset is performed on the mtmeta/mtgene data by <code>subset()</code> and the whole object is then adjusted accordingly.</p>
+    <p>The function <code>mt_subset</code> operates in three steps:</p><ul>
+<li><p><strong>Filter</strong> - genes according to <code>minreads</code> and <code>frac0</code>.</p></li>
+<li><p><strong>Normalise</strong> - as specified in <code>normalise</code>.</p></li>
+<li><p><strong>Subset</strong> - according to <code>sub_genes</code> and <code>sub_samples</code>.</p></li>
+</ul>
+    <p>Subsetting are performed on the mtmeta/mtgene data by <a href='http://www.rdocumentation.org/packages/base/topics/subset'>subset</a> and the whole object is then adjusted accordingly.</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
