@@ -4,7 +4,7 @@ output: md_document
 
 # Tools for metatranscriptome analysis
 
-mmtravis is an R-package to conveniently visualise and analyse NGS transcriptomics data in different ways. \strong{NOTE: This is still in development, so don't expect everything to be working perfectly - yet!}
+mmtravis is an R-package to conveniently visualise and analyse NGS transcriptomics data in different ways. **NOTE: This is still in development, so don't expect everything to be working perfectly - yet!**
 
 ## Installing mmtravis
 First, install [R (3.4.1 or later)](https://mirrors.dotsrc.org/cran/) and [RStudio](https://www.rstudio.com/products/rstudio/download/#download). Windows users should also install [RTools](https://mirrors.dotsrc.org/cran/bin/windows/Rtools/). Then open RStudio as administrator (!) and run the commands below to install mmtravis from the console:
