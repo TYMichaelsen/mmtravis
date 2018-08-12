@@ -23,8 +23,8 @@ Get started
 -----------
 
 Keep an eye out for a get started page, Comming soon! For now, go to the
-[References](https://tymichaelsen.github.io/mmtravis/) page to see a
-list of available functions.
+[References](https://tymichaelsen.github.io/mmtravis/reference/index.html)
+page to see a list of available functions.
 
 Blog posts about mmtravis
 -------------------------
