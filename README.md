@@ -2,7 +2,8 @@ Tools for metatranscriptome analysis
 ====================================
 
 mmtravis is an R-package to conveniently visualise and analyse NGS
-transcriptomics data in different ways.
+transcriptomics data in different ways. **NOTE: This is still in
+development, so don't expect everything to be working perfectly - yet!**
 
 Installing mmtravis
 -------------------
@@ -21,16 +22,15 @@ mmtravis from the console:
 Get started
 -----------
 
-For a quick guide on how to use mmtravis go to the [Get Started](XXX)
-page. Detailed documentation of all mmtravis functions can be found at
-the [Functions](XXX) page.
+Keep an eye out for or get started page, Comming soon! For now, go to
+the [References](https://tymichaelsen.github.io/mmtravis/) page to see a
+list of available functions.
 
 Blog posts about mmtravis
 -------------------------
 
-Check out the blog posts at <http://albertsenlab.org/> about mmtravis:
-
--   [Introducing mmtravis: Our metatranscriptome analysis package](XXX)
+Keep an eye out for upcomming blogposts at <http://albertsenlab.org/>
+about mmtravis
 
 Releases
 --------
