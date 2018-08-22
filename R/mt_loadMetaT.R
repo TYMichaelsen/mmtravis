@@ -29,7 +29,7 @@ tab <- fread(
   header           = T,
   stringsAsFactors = F,
   check.names      = F)
-metaVars <- c("Genome","Contig","start","end","strand","contig_len","ftype","gene","EC_number","product","locus_tag","function","inference")
+metaVars <- c("Genome","Contig","Gene_start","Strand","Inference","Contig_len","ftype","length","Gene","EC_number","COG","product","locus_tag","function")
 
 # Prepare the gene data.
 mtgene <- select(tab,1,2) %>%
@@ -54,8 +54,10 @@ seqstats <- read.delim(
   stringsAsFactors = F) %>%
   {`colnames<-`(.,stringr::str_replace_all(colnames(.), "[^[:alnum:]]", "_"))} %>%
   mutate(SeqID = stringr::str_replace_all(SeqID, "[^[:alnum:]]", "_")) %>%
-  dplyr::rename(SampleID = SeqID)
+  dplyr::rename(SampleID = SeqID) %>%
+  data.table()
 
-out$mtmeta <- left_join(out$mtmeta,seqstats,by = "SampleID")
+out$mtmeta <- left_join(out$mtmeta,seqstats,by = "SampleID") %>% data.table()
+
 return(out)
 }

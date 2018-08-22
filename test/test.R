@@ -7,11 +7,11 @@ library(data.table)
 
 
 tab <- fread(
-  file             = "test/counts.txt",
+  file             = "test/counts_CP361.txt",
   header           = T,
   stringsAsFactors = F,
   check.names      = F)
-metaVars <- c("Genome","Contig","start","end","strand","contig_len","ftype","gene","EC_number","product","locus_tag","function","inference")
+metaVars <- c("Genome","Contig","Gene_start","Strand","Inference","Contig_len","ftype","length","Gene","EC_number","COG","product","locus_tag","function")
 
 # Prepare the gene data.
 genedata <- select(tab,1,2) %>%
@@ -20,36 +20,54 @@ genedata <- select(tab,1,2) %>%
            into   = metaVars,
            sep    = "[|]",
            remove = T) %>%
-  as.data.frame() %>%
-  mutate(length = as.numeric(end) - as.numeric(start))
+  as.data.frame()
 
 # Prepare the count table.
 counttab <- select(tab,-2) %>%
   as.data.frame()
 
 # Metadata.
-metadata  <- read_excel("test/metadata.xlsx") %>%
-  as.data.frame() %>%
-  select(SeqID,everything())
+metadata  <- read_excel("test/CP361_metadata.xlsx") %>%
+  mutate(Samplename = paste0("S",Samplename)) %>%
+  mutate(SEQID_2    = ifelse(is.na(SEQID_2),"",SEQID_2))
+
+# As we have two batches, we need to reshape metadata.
+bch1 <- metadata %>% select(-SEQID_2) %>% dplyr::rename(SEQID = SEQID_1) %>% mutate(batch = "1")
+bch2 <- subset(metadata,SEQID_2 != "") %>% select(-SEQID_1) %>% dplyr::rename(SEQID = SEQID_2) %>% mutate(batch = "2")
+metadata2 <- rbind(bch1,bch2)
 
 ### Load data.
-mt <- mt_loadMetaT(counts.txt = "test/counts.txt",seqstat.txt = "test/seqstat.txt",mtmeta = mtmeta)
+mt <- mt_loadMetaT(
+  counts.txt  = "test/counts_CP361.txt",
+  seqstat.txt = "test/seqstat_CP361.txt",
+  mtmeta      = metadata2)
 
-mt <- mt_load2(mtdata = counttab,mtgene = genedata,mtmeta = metadata)
+mt <- mt_load(mtdata = counttab,mtgene = genedata,mtmeta = metadata2)
 ### Test functions. ############################################################
 # Subset.
-de <- mt_subset2(mt,minreads = 0,frac0 = 1,normalise = "libsize")
+wh <- subset(metadata2,batch == 2)$Samplename %>%
+  paste0(.,collapse = "','") %>%
+  paste0("Samplename %in% c('",.,"')")
 
-mt_subset(mt,sub_genes = "Contig == '1'")
+batch <- mt_subset(mt,sub_samples = wh)
 
-mt_plotpairs(mt,samples = c("HQ180523_13","HQ180523_14"),label_by = "Label",linesize = 2)
 
-hest <- mt_gather(de)
+gat <- mt_gather(mt,metavars = "MetaTrans")
+
+de <- mt_subset2(mt,minreads = 20,frac0 = 0.5,normalise = "TPM",
+                 sub_genes = "Contig == '1'",
+                 sub_samples = "VFA == 'Acetate'")
+
+de <- mt_subset2(mt,sub_genes = "Contig == '1'")
+
+mt_plotpairs(mt,samples = c("HQ180523_1","HQ180523_2"),label_by = "Label",linesize = 2)
+
+hest <- mt_gather(mt)
 
 de_bch <- mt_batch(de,batch = "VFA")
 
 
-mt_stackbar(mt,detailed = T)
+de <- mt_stackbar(mt,detailed = T,group_by = "MetaTrans")
 
 data("example_mmt")
 

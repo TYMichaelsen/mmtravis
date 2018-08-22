@@ -65,9 +65,9 @@ mt_diffexprs <- function(obj,group,
   if (class(obj) == "mmt"){
 
     # Ensure correct format.
-    meta    <- obj$mtmeta
-    data    <- obj$mtdata
-    varmeta <- obj$mtgene
+    meta    <- data.frame(obj$mtmeta,stringsAsFactors = F)
+    data    <- data.frame(obj$mtdata,stringsAsFactors = F)
+    varmeta <- data.frame(obj$mtgene,stringsAsFactors = F)
 
     data    <- `rownames<-`(data,data$GeneID) %>% select(-GeneID)
   } else if (class(obj) == "ampvis2"){
@@ -140,7 +140,7 @@ mt_diffexprs <- function(obj,group,
   if (order_var_by == "variance"){
     if (ncol(logFC) < 3) {
       ord <- order(abs(logFC[,2]),decreasing = T)
-      message("'order_var_by': not possible to order by variance with one sample. Will order by absolute value instead.")
+      message("'order_var_by': not possible to order by variance with < 3 samples. Will order by absolute value instead.")
     } else {
       ord <- order(apply(logFC[,2:ncol(logFC)],1,var),decreasing = T)
     }

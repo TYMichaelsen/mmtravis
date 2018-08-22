@@ -4,14 +4,16 @@
 \alias{mt_dumpDE}
 \title{Extract results from DE analysis done using \code{mt_diffexprs}.}
 \usage{
-mt_dumpDE(mmtDE,nom,denom)
+mt_dumpDE(mmtDE,num,denom)
 }
 \arguments{
 \item{mmtDE}{(\emph{required}) An object of class \code{mmtDE}. See \code{\link{mt_diffexprs}}.}
 
-\item{nom}{(\emph{required}) Level that should be in the nominator when doing the DE analysis.}
+\item{num}{(\emph{required}) Level that should be in the numerator when doing the DE analysis.}
 
 \item{denom}{(\emph{required}) Level that should be in the denominator (i.e. the reference) when doing the DE analysis. If set to "rest", the DE analysis is done as a one-vs-all test. See XXX for details.}
+
+\item{sub_genes}{The genes to include in the MA and boxplot. \emph{default}: all genes)}
 
 \item{signif}{The threshold for adjusted p-value to be considered significant. (\emph{default}: 0.01)}
 
@@ -19,13 +21,15 @@ mt_dumpDE(mmtDE,nom,denom)
 
 \item{ngenes_show}{The number of genes to show in the boxplot. (\emph{default}: 10)}
 
-\item{order_by}{Order the boxplot and table by a statistic from the DE analysis. One of: (\emph{default}: "logFC")
-\itemize{
-  \item logFC - the absolute log2 fold-change betweem \code{nom} and \code{denom}.
-  \item padj - the adjusted p-value of the DE analysis.
-}}
+\item{order_by}{Order the boxplot and table by a statistic from the DE analysis. One of: (\emph{default}: "logFC")}
 
 \item{table_full}{(\emph{logical}) Output entire results table without filtering by significance. (\emph{default}: FALSE)}
+
+\item{annot_size}{The size of text in the MA plot. (\emph{default}: 5)
+\itemize{
+  \item logFC - the absolute log2 fold-change betweem \code{num} and \code{denom}.
+  \item padj - the adjusted p-value of the DE analysis.
+}}
 
 \item{...}{Additional arguments parsed to the \code{\link{vis_boxplot}} function.}
 }
@@ -56,7 +60,7 @@ DE_mt <- mt_diffexprs(example_mmt,
   intercept  = "ANAMMOX")
 
 # Extract results for given levels.
-mt_res <- mt_dumpDE(DE_mt,nom = "ELECTRODE",denom = "SUSPENTION")
+mt_res <- mt_dumpDE(DE_mt,num = "ELECTRODE",denom = "SUSPENTION")
 
 # Show the output.
 mt_res$MAplot

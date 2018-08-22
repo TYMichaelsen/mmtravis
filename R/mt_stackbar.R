@@ -66,14 +66,14 @@ mt_stackbar <- function(mmt,
       } else {
         group_by <- c("SampleID",group_by)
       }
-      grp <- cbind(mmt$mtmeta[1],Group = apply(mmt$mtmeta[,group_by,drop = F], 1, paste, collapse = " ")) %>%
-        mutate(Group = as.character(Group))
+      grp <- mmt$mtmeta[,.(
+        SampleID = SampleID,
+        Group    = Reduce(paste,.SD)),.SDcols = group_by]
     } else {
       stop("Your 'group_by' is not in metadata.",call. = FALSE)
     }
   } else {
-    grp <- cbind(mmt$mtmeta[1],Group = mmt$mtmeta[[1]]) %>%
-      mutate(Group = as.character(Group))
+    grp <- mmt$mtmeta[,.(SampleID = SampleID,Group = as.character(SampleID))]
   }
 
   # Check if seqstat data are available.
@@ -85,13 +85,17 @@ mt_stackbar <- function(mmt,
   }
 
   # Accumulate rRNA and non-rRNA counts.
-  mmt$mtmeta <- mt_gather(mmt) %>%
-    mutate(ftype = ifelse(ftype == "rRNA","rRNA","nonrRNA")) %>%
-    group_by(SampleID,ftype) %>%
-    summarise(x = sum(Exprs)) %>%
-    spread(key = ftype,value = x) %>%
-    mutate(mapped = rRNA+nonrRNA) %>%
-    {suppressWarnings(left_join(mmt$mtmeta,.,by = "SampleID"))}
+  tmp <- mt_gather(mmt,metavars = "ftype")[,.(
+    SampleID = SampleID,GeneID = GeneID,Exprs = Exprs,
+    ftype    = ifelse(ftype == "rRNA","rRNA","nonrRNA"))][,.(
+    x        = sum(Exprs)),by = .(SampleID,ftype)] %>%
+    dcast(SampleID ~ ftype,value.var = "x") %>%
+    .[,.(
+      SampleID = SampleID,rRNA = rRNA,nonrRNA = nonrRNA,
+      mapped = nonrRNA+rRNA)] %>%
+    setkey(SampleID)
+
+  mmt$mtmeta <- tmp[mmt$mtmeta]
 
   # Check values are decreasing.
   dat <- mmt$mtmeta %>% select(Raw,after_QC,mapped)
@@ -102,7 +106,7 @@ mt_stackbar <- function(mmt,
   }
 
   ##### PREPARE DATA #####
-  tab <- mmt$mtmeta %>%
+  tab <- as.data.frame(mmt$mtmeta,stringsAsFactors = F) %>%
     select(Raw,after_QC,mapped,nonrRNA) %>%
     apply(.,1,function(x){
       abs(diff(x)) %>% c(.,Left = unname(x[1]) - sum(.)) %>% `names<-`(.,paste0("raw_",names(.)))

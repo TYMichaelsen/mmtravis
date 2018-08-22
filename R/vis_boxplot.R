@@ -106,9 +106,9 @@ vis_boxplot <- function(obj,group_by,
     }
 
     ### Ensure correct format. ###
-    meta    <- obj$mtmeta
-    data    <- obj$mtdata
-    varmeta <- obj$mtgene
+    meta    <- data.frame(obj$mtmeta,stringsAsFactors = F)
+    data    <- data.frame(obj$mtdata,stringsAsFactors = F)
+    varmeta <- data.frame(obj$mtgene,stringsAsFactors = F)
 
     if(!all(row_labels %in% colnames(varmeta))) stop("row_labels: not in variable metadata.",call. = FALSE)
 
@@ -186,7 +186,6 @@ vis_boxplot <- function(obj,group_by,
     if(boxgroup_by == group_by) stop("You cannot set boxgroup_by and group_by to the same.",call. = FALSE)
   }
 
-
   ### Prepare data for plotting ################################################
   # Normalise.
   if (normalise == "total" | normalise == "none"){
@@ -243,7 +242,9 @@ vis_boxplot <- function(obj,group_by,
   # Subset data.
   data_long_sort <- data_long %>%
     filter(ID %in% wh) %>%
-    mutate(ID = factor(ID,levels = wh))
+    mutate(ID = factor(ID,levels = wh)) %>%
+    arrange(ID) %>%
+    mutate(Display = factor(Display,levels = unique(Display)))
 
   # Merge with grouping variable.
   suppressWarnings(
@@ -312,11 +313,16 @@ vis_boxplot <- function(obj,group_by,
 
   if (plot_flip == TRUE){ p <- p + coord_flip()}
 
-  if (plot_type == "point"){ p <- p + geom_point(aes(colour = Group),size = point_size)}
-  if (plot_type == "boxplot"){p <- p + geom_boxplot(outlier.size = point_size)}
+  if (plot_type == "point"){
+    p <- p +
+      geom_point(aes(colour = Group),size = point_size) +
+      guides(fill = FALSE,colour = guide_legend(title = paste(group_by,collapse = " - ")))}
+  if (plot_type == "boxplot"){
+    p <- p +
+      geom_boxplot(outlier.size = point_size) +
+      guides(fill = guide_legend(title = paste(group_by,collapse = " - ")))}
   if (plot_log == TRUE){ p <- p + scale_y_log10()}
 
-  p <- p +  guides(fill = guide_legend(title = paste(group_by,collapse = " - ")))
   if (detailed_output) {
     return(list(plot = p, data = data_long_sort))
   } else

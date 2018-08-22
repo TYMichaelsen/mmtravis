@@ -63,29 +63,37 @@ print.mmt <- function(obj){
 mt_gather <- function(mmt,metavars = NULL){
   samps <- colnames(mmt$mtdata)[-1]
 
+  # Setup the vectors for column selection (select all if metavars = NULL).
+  if(is.null(metavars)) metavars <- c(colnames(mmt$mtgene),colnames(mmt$mtmeta))
+
+  metaV <- metavars %w/o% c("SampleID",colnames(mmt$mtgene))
+  geneV <- metavars %w/o% c("GeneID",colnames(mmt$mtmeta))
+  if (!all(metaV %in% colnames(mmt$mtmeta)) | !all(geneV %in% colnames(mmt$mtgene)))
+    stop("'metavars' must be valid column names from either mtgene or mtmeta.",call. = FALSE)
+
   # Join the mtgene and mtdata.
-  gdat <- inner_join(mmt$mtgene,mmt$mtdata,by = "GeneID") %>%
-    data.table() %>%
-  {data.table::melt(.,
-    id.vars       = colnames(.) %w/o% samps,
+  gdat <- data.table:::merge.data.table(
+    data.table:::subset.data.table(mmt$mtgene,select = c("GeneID",geneV)),
+    mmt$mtdata,by = "GeneID")
+  wh <- match(mmt$mtgene$GeneID,gdat$GeneID)
+  setroworder(gdat,neworder = wh)
+  gdat <- melt(gdat,
+    id.vars       = colnames(gdat) %w/o% samps,
     measure.vars  = samps,
     value.name    = "Exprs",
-    variable.name = "SampleID")}
+    variable.name = "SampleID")
+  gdat[,ID := .I]
 
   # Join with mtmeta.
-  gdat <- data.table:::merge.data.table(data.table(mmt$mtmeta),gdat,by = "SampleID")
+  gdat <- data.table:::merge.data.table(
+    data.table:::subset.data.table(mmt$mtmeta,select = c("SampleID",metaV)),
+    gdat,by = "SampleID")
+  setorder(gdat,ID)
+  gdat[,ID := NULL]
 
-  # Keep only 'metavars'.
-  if(!is.null(metavars)){
-    if(all(metavars %in% colnames(gdat))){
-      metavars <- metavars %w/o% c("SampleID","GeneID")
-      gdat <- select(gdat,SampleID,GeneID,Exprs,one_of(metavars))
-    } else {
-      stop("'metavars' must be valid column names from either mtgene or mtmeta.",call. = FALSE)
-    }
-  } else {
-    gdat <- select(gdat,SampleID,GeneID,Exprs,everything())
-  }
+  # Set correct column order.
+  setcolorder(gdat,c("SampleID","GeneID","Exprs",metaV,geneV))
+  return(gdat)
 }
 #' The row-version of setcolorder in data.table (internal function)
 #'

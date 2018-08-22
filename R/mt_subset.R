@@ -12,7 +12,8 @@
 #' @param normalise Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (\emph{default:} \code{"none"})
 #' \itemize{
 #'    \item \code{"quantile"}: Quantile normalization. See \link[preprocessCore]{normalize.quantiles} for details.
-#'    \item \code{"total"}: Normalise the read counts to be in percent per sample.
+#'    \item \code{"TPM"}: Normalise read counts to Transcripts Per Milion (TPM).
+#'    \item \code{"abundance"}: Normalise read counts to relative abundance.
 #'    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
 #'    \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
 #'    \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.
@@ -68,7 +69,6 @@
 #' }
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
-
 mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0 = 1,normalise = "none"){
 
   #For printing removed samples and OTUs
@@ -78,14 +78,15 @@ mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0
   ##### FILTERING #####
   # remove genes below minreads and more than frac0 zeros.
   if (frac0 < 0 | frac0 > 1) stop("'frac0' has to be between [0,1]",call. = FALSE)
-  wh <- mmt$mtdata[,-1] %>% {
-    rowSums(.) >= minreads &
-    apply(.,1,function(x){sum(x == 0,na.rm = T)})/ncol(.) <= frac0}
 
-  #DT[,Sum := lapply(.SD,sum),.SDcols = colnames(DT)[-1]][Sum >= minreads]
+  wh <- mmt$mtdata[,.(
+    Sum     = Reduce(`+`,.SD), # Sum rows.
+    Zeros   = Reduce(`+`,lapply(.SD,`==`,e2 = 0))/length(.SD)), # fraction of zeros per row.
+    .SDcols = colnames(mmt$mtdata)[-1]][,Sum >= minreads & Zeros <= frac0]
 
-  mmt$mtdata <- mmt$mtdata[wh,,drop = F]
-  if(!is.null(mmt$mtgene)) mmt$mtgene <- mmt$mtgene[wh,,drop = F]
+  mmt$mtdata <- mmt$mtdata[wh]
+
+  if(!is.null(mmt$mtgene)) mmt$mtgene <- mmt$mtgene[wh]
 
   ##### NORMALISE #####
   if(normalise != "none"){
@@ -93,27 +94,26 @@ mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0
       stop("The data has allready been normalised.",call. = FALSE)
     }
     attributes(mmt)$normalised <- normalise
+    Cols <- colnames(mmt$mtdata)[-1]
 
     # Normalise data.
     if (normalise == "quantile"){
-      mmt$mtdata[,-1] <- preprocessCore::normalize.quantiles(as.matrix(mmt$mtdata[,-1]))
-    } else if (normalise == "total"){
-      mmt$mtdata[,-1] <- as.data.frame(apply(mmt$mtdata[,-1, drop = FALSE],
-                          2, function(x) x/sum(x) * 100))
-    } else if (normalise %in% c("libsize","vst","log2")) {
-      x_norm <- mmt$mtdata[,-1] %>%
-        as.matrix() %>%
-        {t(t(.)/DESeq2::estimateSizeFactorsForMatrix(.))} %>%
-        as.data.frame()
-      if (normalise == "vst"){
-        mmt$mtdata[,-1] <- suppressMessages(mmt$mtdata[,-1] %>%
-          as.matrix() %>%
-          vst())
-      } else if (normalise == "log2"){
-        mmt$mtdata[,-1] <- log2(x_norm + 1)
-      } else {
-        mmt$mtdata[,-1] <- x_norm
+      mmt$mtdata[,(Cols) := data.table(preprocessCore::normalize.quantiles(as.matrix(.SD))),.SDcols = Cols]
+    } else if (normalise == "abundance"){
+      mmt$mtdata[,(Cols) := lapply(.SD,function(x){ x/sum(x) * 100 }),.SDcols = Cols]
+    } else if (normalise == "TPM"){
+      if(!("length" %in% colnames(mmt$mtgene))) stop("To normalise by TPM you need a column named 'length' in mtgene, specifying the gene length.")
+      TPM <- function(counts,lengths){
+        rate = log(counts) - log(lengths)
+        exp(rate - log(sum(exp(rate))) + log(10 ^ 6))
       }
+      mmt$mtdata[,length := mmt$mtgene$length][,(Cols) := lapply(.SD,TPM,lengths = length),.SDcols = Cols][,length := NULL]
+    } else if (normalise == "libsize") {
+      mmt$mtdata[,(Cols) := data.table(as.matrix(.SD) %>% {t(t(.)/DESeq2::estimateSizeFactorsForMatrix(.))}),.SDcols = Cols]
+    } else if (normalise == "vst"){
+      mmt$mtdata[,(Cols) := data.table(as.matrix(.SD) %>% DESeq2::vst()),.SDcols = Cols]
+    } else if (normalise == "log2"){
+      mmt$mtdata[,(Cols) := lapply(.SD,function(x){log2(x + 1)}),.SDcols = Cols]
     } else {
       stop("normalise: please specify a valid argument.",call. = FALSE)
     }
@@ -127,20 +127,20 @@ mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0
     },error = function(e){
       stop("The provided 'sub_samples' string is not meaningfull for the metadata.")
     }) %>% {mmt$mtmeta$SampleID %in% .$SampleID}
-    mmt$mtmeta <- mmt$mtmeta[wh,,drop = F]
-    mmt$mtdata <- mmt$mtdata[,c(TRUE,wh),drop = F]
+    mmt$mtmeta <- mmt$mtmeta[wh]
+    mmt$mtdata[,(1+which(!wh)) := NULL]
   }
 
   # Subset genes.
   if (!is.null(mmt$mtgene)){
     if(!is.null(sub_genes)){
       wh <- tryCatch(expr = {
-        mmt$mtgene %>% filter(eval(parse(text = sub_genes)))
+        mmt$mtgene[eval(parse(text = sub_genes))]
       },error = function(e){
         stop("The provided 'sub_genes' string is not meaningfull for the gene data.")
-      }) %>% {mmt$mtgene$GeneID %in% .$GeneID}
-      mmt$mtdata <- mmt$mtdata[wh,,drop = F]
-      mmt$mtgene <- mmt$mtgene[wh,,drop = F]
+      }) %>% .$GeneID
+      mmt$mtdata <- mmt$mtdata[GeneID %in% wh]
+      mmt$mtgene <- mmt$mtgene[GeneID %in% wh]
     }
   } else {
     stop("There is no gene data available for this mmt object.")

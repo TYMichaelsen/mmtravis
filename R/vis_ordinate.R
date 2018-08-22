@@ -169,9 +169,9 @@ vis_ordinate <- function(obj,
     if(is.null(var_label_by))    var_label_by    <- "GeneID"
 
     # Ensure correct format.
-    meta    <- obj$mtmeta
-    data    <- obj$mtdata
-    varmeta <- obj$mtgene
+    meta    <- as.data.frame(obj$mtmeta,stringsAsFactor = F)
+    data    <- as.data.frame(obj$mtdata,stringsAsFactor = F)
+    varmeta <- as.data.frame(obj$mtgene,stringsAsFactor = F)
 
     data    <- `rownames<-`(data,data$GeneID) %>% select(-GeneID)
 

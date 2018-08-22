@@ -132,7 +132,8 @@
       <th>normalise</th>
       <td><p>Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (<em>default:</em> <code>"none"</code>)</p><ul>
 <li><p><code>"quantile"</code>: Quantile normalization. See <a href='http://www.rdocumentation.org/packages/preprocessCore/topics/normalize.quantiles'>normalize.quantiles</a> for details.</p></li>
-<li><p><code>"total"</code>: Normalise the read counts to be in percent per sample.</p></li>
+<li><p><code>"TPM"</code>: Normalise read counts to Transcripts Per Milion (TPM).</p></li>
+<li><p><code>"abundance"</code>: Normalise read counts to relative abundance.</p></li>
 <li><p><code>"libsize"</code>: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See <a href='http://www.rdocumentation.org/packages/DESeq2/topics/estimateSizeFactorsForMatrix'>estimateSizeFactorsForMatrix</a> for details.</p></li>
 <li><p><code>"vst"</code>: Normalise as "libsize" and perform robust log2-transformation. See <a href='http://www.rdocumentation.org/packages/DESeq2/topics/vst'>vst</a> for details.</p></li>
 <li><p><code>"log2"</code>: Normalise as "libsize" and perform log2(x + 1)-transformation.</p></li>

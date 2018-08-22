@@ -20,7 +20,8 @@ mt_subset(data, ...)
 \item{normalise}{Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (\emph{default:} \code{"none"})
 \itemize{
    \item \code{"quantile"}: Quantile normalization. See \link[preprocessCore]{normalize.quantiles} for details.
-   \item \code{"total"}: Normalise the read counts to be in percent per sample.
+   \item \code{"TPM"}: Normalise read counts to Transcripts Per Milion (TPM).
+   \item \code{"abundance"}: Normalise read counts to relative abundance.
    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
    \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
    \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.

@@ -158,9 +158,9 @@ mt_load <- function(mtdata,mtgene = NULL,mtmeta = NULL){
   setroworder(mtgene,neworder = match(mtdata$GeneID,mtgene$GeneID))
 
   out <- list(
-    mtdata = as.data.frame(mtdata,stringsAsFactors = F),
-    mtgene = as.data.frame(mtgene,stringsAsFactors = F),
-    mtmeta = as.data.frame(mtmeta,stringsAsFactors = F))
+    mtdata = mtdata,
+    mtgene = mtgene,
+    mtmeta = mtmeta)
 
   class(out) <- "mmt"
   return(out)

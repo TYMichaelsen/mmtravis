@@ -103,7 +103,7 @@
     
     </div>
 
-    <pre class="usage"><span class='fu'>mt_dumpDE</span>(<span class='no'>mmtDE</span>,<span class='no'>nom</span>,<span class='no'>denom</span>)</pre>
+    <pre class="usage"><span class='fu'>mt_dumpDE</span>(<span class='no'>mmtDE</span>,<span class='no'>num</span>,<span class='no'>denom</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -113,12 +113,16 @@
       <td><p>(<em>required</em>) An object of class <code>mmtDE</code>. See <code><a href='mt_diffexprs.html'>mt_diffexprs</a></code>.</p></td>
     </tr>
     <tr>
-      <th>nom</th>
-      <td><p>(<em>required</em>) Level that should be in the nominator when doing the DE analysis.</p></td>
+      <th>num</th>
+      <td><p>(<em>required</em>) Level that should be in the numerator when doing the DE analysis.</p></td>
     </tr>
     <tr>
       <th>denom</th>
       <td><p>(<em>required</em>) Level that should be in the denominator (i.e. the reference) when doing the DE analysis. If set to "rest", the DE analysis is done as a one-vs-all test. See XXX for details.</p></td>
+    </tr>
+    <tr>
+      <th>sub_genes</th>
+      <td><p>The genes to include in the MA and boxplot. <em>default</em>: all genes)</p></td>
     </tr>
     <tr>
       <th>signif</th>
@@ -134,14 +138,18 @@
     </tr>
     <tr>
       <th>order_by</th>
-      <td><p>Order the boxplot and table by a statistic from the DE analysis. One of: (<em>default</em>: "logFC")</p><ul>
-<li><p>logFC - the absolute log2 fold-change betweem <code>nom</code> and <code>denom</code>.</p></li>
-<li><p>padj - the adjusted p-value of the DE analysis.</p></li>
-</ul></td>
+      <td><p>Order the boxplot and table by a statistic from the DE analysis. One of: (<em>default</em>: "logFC")</p></td>
     </tr>
     <tr>
       <th>table_full</th>
       <td><p>(<em>logical</em>) Output entire results table without filtering by significance. (<em>default</em>: FALSE)</p></td>
+    </tr>
+    <tr>
+      <th>annot_size</th>
+      <td><p>The size of text in the MA plot. (<em>default</em>: 5)</p><ul>
+<li><p>logFC - the absolute log2 fold-change betweem <code>num</code> and <code>denom</code>.</p></li>
+<li><p>padj - the adjusted p-value of the DE analysis.</p></li>
+</ul></td>
     </tr>
     <tr>
       <th>...</th>
@@ -176,7 +184,7 @@
   <span class='kw'>intercept</span>  <span class='kw'>=</span> <span class='st'>"ANAMMOX"</span>)
 
 <span class='co'># Extract results for given levels.</span>
-<span class='no'>mt_res</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_dumpDE</span>(<span class='no'>DE_mt</span>,<span class='kw'>nom</span> <span class='kw'>=</span> <span class='st'>"ELECTRODE"</span>,<span class='kw'>denom</span> <span class='kw'>=</span> <span class='st'>"SUSPENTION"</span>)
+<span class='no'>mt_res</span> <span class='kw'>&lt;-</span> <span class='fu'>mt_dumpDE</span>(<span class='no'>DE_mt</span>,<span class='kw'>num</span> <span class='kw'>=</span> <span class='st'>"ELECTRODE"</span>,<span class='kw'>denom</span> <span class='kw'>=</span> <span class='st'>"SUSPENTION"</span>)
 
 <span class='co'># Show the output.</span>
 <span class='no'>mt_res</span>$<span class='no'>MAplot</span>
