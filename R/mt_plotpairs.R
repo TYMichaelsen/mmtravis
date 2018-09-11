@@ -57,8 +57,13 @@ mt_plotpairs <- function(mmt,
     label_by <- samples
   }
 
+  ## Order according to samples (if specified)
+  ord      <- match(samples,mmt$mtmeta$SampleID)
+  label_by <- label_by[ord]
+
   ## Prepare the data.
-  dat <- mmt$mtdata[,-1] %>% {log2(. + 1)}
+  dat <- mmt$mtdata[,.SD,.SDcols = (ord+1)]
+  for (j in colnames(dat)) set(dat, j = j, value = log2(dat[[j]] + 1))
   rng <- range(dat)
 
   ## Make a blank plot
@@ -81,15 +86,14 @@ mt_plotpairs <- function(mmt,
   temp <- list()
   for (i in 1:length(samples)){
     for (j in 1:length(samples)){
-      # Subset data and calc correlation (0's omitted).
-      dat_sub <- dat %>%
-        transmute_(x = samples[j],y = samples[i]) %>%
-        mutate_all(funs(round(.,2)))
+      # Subset data and round to 2 decimals.
+      dat_sub <- data.table(x = dat[[samples[j]]],
+                            y = dat[[samples[i]]])
+      for (k in colnames(dat_sub)) set(dat_sub, j = k, value = round(dat_sub[[k]],2))
 
       if (i < j){
         # Remove duplicated datapoints before plotting.
-        dat_sub_uni <- dat_sub %>%
-        {.[!duplicated(.),]}
+        dat_sub_uni <- unique(dat_sub)
 
         # make plot
         p <- ggplot(dat_sub_uni,aes(x = x,

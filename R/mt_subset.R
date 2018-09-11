@@ -16,7 +16,7 @@
 #'    \item \code{"abundance"}: Normalise read counts to relative abundance.
 #'    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
 #'    \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
-#'    \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.
+#'    \item \code{"log2"}: Perform log2(x + 1)-transformation.
 #'    \item \code{"none"}: No normalisation.
 #'    }
 #'
@@ -104,7 +104,7 @@ mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0
     } else if (normalise == "TPM"){
       if(!("length" %in% colnames(mmt$mtgene))) stop("To normalise by TPM you need a column named 'length' in mtgene, specifying the gene length.")
       TPM <- function(counts,lengths){
-        rate = log(counts) - log(lengths)
+        rate = log(counts) - log(as.numeric(lengths))
         exp(rate - log(sum(exp(rate))) + log(10 ^ 6))
       }
       mmt$mtdata[,length := mmt$mtgene$length][,(Cols) := lapply(.SD,TPM,lengths = length),.SDcols = Cols][,length := NULL]

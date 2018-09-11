@@ -60,7 +60,7 @@ print.mmt <- function(obj){
 #' @export
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
-mt_gather <- function(mmt,metavars = NULL){
+mt_gather <- function(mmt,metavars = c("SampleID","GeneID")){
   samps <- colnames(mmt$mtdata)[-1]
 
   # Setup the vectors for column selection (select all if metavars = NULL).

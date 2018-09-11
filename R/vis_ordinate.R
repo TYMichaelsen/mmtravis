@@ -543,13 +543,13 @@ vis_ordinate <- function(obj,
                          }
     )
     plot <- plot +
-      suppressWarnings(geom_point(size = 2, alpha = opacity,
+      suppressWarnings(geom_point(size = 2, #alpha = opacity,
                                   aes(text = data_plotly))) + #HER
       theme_minimal() +
       theme(axis.line = element_line(colour = "black", size = 0.5))
   } else {
     plot <- plot +
-      geom_point(size = sample_point_size, alpha = opacity) +
+      geom_point(size = sample_point_size) + #, alpha = opacity) +
       theme_minimal() +
       theme(axis.line = element_line(colour = "black", size = 0.5))
   }
@@ -589,15 +589,15 @@ vis_ordinate <- function(obj,
                    color = "darkgrey",
                    shape = var_shape,
                    size = var_point_size-1,
-                   alpha = opacity,
+                   #alpha = opacity,
                    aes(text = data_plotly))
     } else{
       plot <- plot +
         geom_point(data = dvar,
                    color = "darkgrey",
                    shape = var_shape,
-                   size = var_point_size,
-                   alpha = opacity)
+                   size = var_point_size)
+                   #alpha = opacity)
     }
 
   }

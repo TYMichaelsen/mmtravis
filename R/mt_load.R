@@ -104,6 +104,8 @@ mt_load <- function(mtdata,mtgene = NULL,mtmeta = NULL){
   mtdata <- data.table(mtdata)
 
   ### CORRECT NAMING ###
+  # Correct generic SampleID and GeneID.
+
   setnames(mtdata,old = colnames(mtdata),new = stringr::str_replace_all(colnames(mtdata), "[^[:alnum:]]", "_"))
   setnames(mtmeta,old = colnames(mtmeta),new = stringr::str_replace_all(colnames(mtmeta), "[^[:alnum:]]", "_"))
   setnames(mtgene,old = colnames(mtgene),new = stringr::str_replace_all(colnames(mtgene), "[^[:alnum:]]", "_"))

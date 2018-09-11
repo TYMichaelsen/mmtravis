@@ -4,7 +4,7 @@
 \alias{mt_gather}
 \title{Gather the mmt object into one dataframe, suitable for e.g. ggplot or custom analysis (internal function)}
 \usage{
-mt_gather(mmt, metavars = NULL)
+mt_gather(mmt, metavars = c("SampleID", "GeneID"))
 }
 \arguments{
 \item{mmt}{(\emph{required}) Data list as loaded with \code{\link{mt_load}}.}

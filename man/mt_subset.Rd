@@ -24,7 +24,7 @@ mt_subset(data, ...)
    \item \code{"abundance"}: Normalise read counts to relative abundance.
    \item \code{"libsize"}: Normalise the read counts to adjust for gene dispersion and total read counts per sample. See \link[DESeq2]{estimateSizeFactorsForMatrix} for details.
    \item \code{"vst"}: Normalise as "libsize" and perform robust log2-transformation. See \link[DESeq2]{vst} for details.
-   \item \code{"log2"}: Normalise as "libsize" and perform log2(x + 1)-transformation.
+   \item \code{"log2"}: Perform log2(x + 1)-transformation.
    \item \code{"none"}: No normalisation.
    }}
 }

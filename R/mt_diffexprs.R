@@ -100,12 +100,12 @@ mt_diffexprs <- function(obj,group,
   }
 
   if(is.null(intercept)){
-    levs <- sort(unique(meta[[group]]))
+    levs <- as.character(sort(unique(meta[[group]])))
   } else {
     if(!(intercept %in% meta[[group]])){
       stop(paste0("intercept '",intercept,"' is not a level in '",group,"'"))
     } else {
-      levs <- sort(unique(meta[[group]])) %>% {c(intercept,(. %w/o% intercept))}
+      levs <- as.character(sort(unique(meta[[group]]))) %>% {c(intercept,(. %w/o% intercept))}
     }
   }
   meta[[group]] <- factor(meta[[group]],levels = levs)
@@ -129,12 +129,13 @@ mt_diffexprs <- function(obj,group,
     x <- res[[i]] %>%
       data.frame() %>%
       select(log2FoldChange) %>%
-      {eval(parse(text = paste0("dplyr::rename(.,'",i,"' = log2FoldChange)")))}
-  }) %>% Reduce(f = function(x,y){merge(x,y,by = 0)},x = .) %>%
+      {eval(parse(text = paste0("dplyr::rename(.,'",i,"' = log2FoldChange)")))} %>%
+      rownames_to_column("ID")
+  }) %>% {base::Reduce(f = function(x,y){merge.data.frame(x,y,by = 1)},x = .)} %>%
   {if (ncol(.) < 2)
      rownames_to_column(.,colnames(varmeta)[1])
    else
-   {eval(parse(text = paste0("dplyr::rename(.,'",colnames(varmeta)[1],"' = Row.names)")))}}
+   {eval(parse(text = paste0("dplyr::rename(.,'",colnames(varmeta)[1],"' = ID)")))}}
 
   # Order by 'order_var_by'
   if (order_var_by == "variance"){

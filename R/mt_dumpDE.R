@@ -115,7 +115,7 @@ mt_dumpDE <- function(mmtDE,num,denom,
     geom_hline(yintercept = 0, color = "darkred", lty = 2) +
     geom_point(size = 1) +
     scale_x_log10() +
-    scale_color_manual(na.value = "black", values = c("red", "black")) +
+    scale_color_manual(na.value = "black", values = c("Yes" = "red","No" = "black")) +
     theme_classic() +
     theme(axis.line.x = element_line(),
           axis.line.y = element_line(),

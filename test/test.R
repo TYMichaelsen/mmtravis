@@ -98,9 +98,15 @@ vis_boxplot(AalborgWWTPs,group_by = "Period")
 
 # Differential expression stuff.
 DE_mt <- mt_diffexprs(mt,
-  group      = "Type",
+  group      = "Experiment",
   row_labels = c("GeneID","product"),
-  intercept  = "ANAMMOX")
+  intercept  = "mAlg")
+
+
+mt_res <- mt_dumpDE(DE_mt,num = "mPec",denom = "mAlg",title_size = 10)
+
+mt_res$BOXplot + scale_y_log10()
+mt_res$MAplot
 
 # Load data.
 data("example_mmt")
@@ -112,12 +118,15 @@ DE_mt <- mt_diffexprs(example_mmt,
                       intercept  = "ANAMMOX")
 
 # Extract results for given levels.
-mt_res <- mt_dumpDE(DE_mt,nom = "ELECTRODE",denom = "SUSPENTION")
+mt_res <- mt_dumpDE(DE_mt,num = "ELECTRODE",denom = "SUSPENTION",title_size = 8)
 
 # Show the output.
 mt_res$MAplot
 mt_res$BOXplot
 head(mt_res$Table)
+
+
+
 
 
 
