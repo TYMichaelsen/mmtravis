@@ -13,7 +13,7 @@ mt_subset(data, ...)
 
 \item{sub_samples}{(\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \link[base]{subset}.}
 
-\item{minreads}{Minimum average number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})}
+\item{minreads}{Minimum number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})}
 
 \item{frac0}{Fraction of zeros allowed per gene. Genes with a higher fraction of zeros will be removed. (\emph{default:} \code{1})}
 

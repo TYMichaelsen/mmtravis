@@ -7,7 +7,7 @@
 #' @param mmt (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
 #' @param sub_genes (\emph{optional}) A string specifying a logical row subset operation on the mtgene dataframe in the mt object parsed to \link[base]{subset}.
 #' @param sub_samples (\emph{optional}) A string specifying a logical row subset operation on the mtmeta dataframe in the mt object parsed to \link[base]{subset}.
-#' @param minreads Minimum average number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})
+#' @param minreads Minimum number of reads pr. gene. Genes below this value will be removed. (\emph{default:} \code{0})
 #' @param frac0 Fraction of zeros allowed per gene. Genes with a higher fraction of zeros will be removed. (\emph{default:} \code{1})
 #' @param normalise Normalise the read counts AFTER reads have been removed by the minreads argument but BEFORE any sample/gene subsetting. (\emph{default:} \code{"none"})
 #' \itemize{
