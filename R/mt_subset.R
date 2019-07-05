@@ -135,7 +135,7 @@ mt_subset <- function(mmt,sub_genes = NULL,sub_samples = NULL,minreads = 0,frac0
   if (!is.null(mmt$mtgene)){
     if(!is.null(sub_genes)){
       wh <- tryCatch(expr = {
-        mmt$mtgene[eval(parse(text = sub_genes))]
+        mmt$mtgene[eval(parse(text = paste0("(",sub_genes,")")))]
       },error = function(e){
         stop("The provided 'sub_genes' string is not meaningfull for the gene data.")
       }) %>% .$GeneID
