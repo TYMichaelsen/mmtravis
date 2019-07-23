@@ -11,6 +11,8 @@ mt_diffexprs(obj,group)
 
 \item{group}{(\emph{required}) Character string defining the grouping variable to use for differential expression.}
 
+\item{Genome}{(\emph{optional}) If provided, character string defining the grouping variable in \code{mt$mtgene} to perform genome-specific normalization (See details).}
+
 \item{intercept}{(\emph{optional}) Specify the level of 'group' to be used as reference/intercept. Default is by alphabetical order.}
 
 \item{row_labels}{(\emph{optional}) Specify columns of rowdata to print on heatmap.}
@@ -31,7 +33,12 @@ A list with 2 elements:
 mt_diffexprs
 }
 \details{
-Typically one would subset low-expression genes (use \code{\link{mt_subset}}) before performing the analysis, due to a low signal/noise ratio. This also drastically reduces computation times and improves stability of the parameter estimation.
+Typically one would subset low-expression genes (use \code{\link{mt_subset}})
+before performing the analysis, due to a low signal/noise ratio. This also drastically
+reduces computation times and improves stability of the parameter estimation. If the
+parameter \code{Genome} is set, a genome-specific normalization of the count matrix
+is performed prior to standard DESeq2 analysis.
+For more details see \href{https://peerj.com/articles/3859/}{Klingenberg & Meinicke (2017)}.
 }
 \examples{
 \dontrun{

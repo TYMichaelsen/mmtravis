@@ -6,6 +6,7 @@
 #'
 #' @param obj     (\emph{required}) An object of class 'mmt' (see \code{\link{mt_load}}) or 'ampvis2' (see \code{amp_load}).
 #' @param group   (\emph{required}) Character string defining the grouping variable to use for differential expression.
+#' @param Genome (\emph{optional}) If provided, character string defining the grouping variable in \code{mt$mtgene} to perform genome-specific normalization (See details).
 #' @param intercept  (\emph{optional}) Specify the level of 'group' to be used as reference/intercept. Default is by alphabetical order.
 #' @param row_labels (\emph{optional}) Specify columns of rowdata to print on heatmap.
 #' @param row_show (\emph{optional}) The number of rows to show.
@@ -24,12 +25,17 @@
 #' @importFrom S4Vectors mcols mcols<-
 #' @importFrom dplyr select rename right_join mutate
 #' @importFrom tidyr gather
-#' @importFrom DESeq2 DESeqDataSetFromMatrix DESeq results
+#' @importFrom DESeq2 DESeqDataSetFromMatrix estimateSizeFactorsForMatrix DESeq results
 #' @importFrom rlang syms
 #'
 #' @export
 #'
-#' @details Typically one would subset low-expression genes (use \code{\link{mt_subset}}) before performing the analysis, due to a low signal/noise ratio. This also drastically reduces computation times and improves stability of the parameter estimation.
+#' @details Typically one would subset low-expression genes (use \code{\link{mt_subset}})
+#' before performing the analysis, due to a low signal/noise ratio. This also drastically
+#' reduces computation times and improves stability of the parameter estimation. If the
+#' parameter \code{Genome} is set, a genome-specific normalization of the count matrix
+#' is performed prior to standard DESeq2 analysis.
+#' For more details see \href{https://peerj.com/articles/3859/}{Klingenberg & Meinicke (2017)}.
 #'
 #' @examples
 #' \dontrun{
@@ -54,6 +60,7 @@
 #' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
 
 mt_diffexprs <- function(obj,group,
+                         Genome     = NULL,
                          intercept  = NULL,
                          row_labels = NULL,
                          order_var_by = "variance",
@@ -111,12 +118,47 @@ mt_diffexprs <- function(obj,group,
   meta[[group]] <- factor(meta[[group]],levels = levs)
 
   ##### Run the DESeq2 workflow. #####
-  dds <- DESeqDataSetFromMatrix(
-    countData = data,
-    colData   = meta,
-    design    = as.formula(paste0("~",group)))
-  mcols(dds) <- varmeta
-  dds <- DESeq(dds)
+  if (is.null(Genome)){
+    dds <- DESeqDataSetFromMatrix(
+      countData = data,
+      colData   = meta,
+      design    = as.formula(paste0("~",group)))
+    mcols(dds) <- varmeta
+    dds <- DESeq(dds)
+  } else {
+    if (!(Genome %in% colnames(varmeta))){
+      stop(paste0("'",Genome,"' is not a valid column in mtgene data."))
+    } else {
+
+      # Normalize by genome.
+      data_norm <- lapply(unique(varmeta$Genome),function(x){
+        # Pick out genes of interest.
+        wh_genes <- filter(varmeta,Genome == x)[[1]]
+
+        # Create the normalized counts.
+        tryCatch(expr = {
+          as.matrix(data[wh_genes,]) %>%
+            {t(t(.)/estimateSizeFactorsForMatrix(.))} %>%
+            round() %>%
+            `storage.mode<-`("integer")
+        },error = function(e){
+          stop(paste0("The estimateSizeFactorsForMatrix() fails for genome '",x,"', likely due to insufficient data."))
+        })
+      }) %>%
+        do.call(rbind,.)
+
+      # Reorder rows to match obj.
+      data_norm <- data_norm[rownames(data),]
+
+      # Perform DE analysis on normalized data.
+      dds <- DESeqDataSetFromMatrix(
+        countData = data_norm,
+        colData   = meta,
+        design    = as.formula(paste0("~",group)))
+      mcols(dds) <- varmeta
+      dds <- DESeq(dds)
+    }
+  }
 
   ##### Build heatmap #####
   # Extract results
