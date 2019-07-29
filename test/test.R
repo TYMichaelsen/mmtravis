@@ -125,8 +125,13 @@ mt_res$MAplot
 mt_res$BOXplot
 head(mt_res$Table)
 
+# Enrichment analysis.
 
+# Suppose we have a set of genes which want to test for functional enrichment.
+Genes <- sample(mt$mtgene$GeneID,size = 1000)
+head(Genes)
 
+COGenrich <- mt_enrichCOG(mt,GeneIDs = Genes,COGs = "COG",alternative = "two.sided",show_p = 0.01)
 
 
 

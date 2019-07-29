@@ -110,6 +110,93 @@ setroworder <- function(x, neworder) {
     .Call(data.table:::Creorder, x, as.integer(neworder), PACKAGE = "data.table")
     invisible(x)
 }
+#' Computes a by-genome frequency matrix of any attribute in the mtgene data (internal function)
+#'
+#' @param mmt (\emph{required}) Data list as loaded with \code{\link{mt_load}}.
+#' @param Genome (\emph{required}) Column name in mtgene grouping into genomes. NA and empty fields are ignored.
+#' @param ID (\emph{required}) Column name in mtgene identifying the attribute. NA and empty fields are ignored.
+#'
+#' @import data.table
+#'
+#' @return A data.table
+#' @export
+#'
+#' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
+mt_GenomeFrequencyMatrix <- function(mmt,Genome,ID){
+
+  XX <- Genome
+  YY <- ID
+
+  out <- mmt$mtgene[,.(Freq = .N),by = mget(c(XX,YY))]
+  setnames(out,old = 1:3,new = c("Genome","ID","Freq"))
+
+  out <- out[!(Genome == "" | is.na(Genome) | ID == "" | is.na(Genome))]
+
+  dcast(out,ID ~ Genome,fill = 0,value.var = "Freq")
+}
+
+#' performs a hypergeometric test on a set of genes (internal function)
+#'
+#' @param q_genes (\emph{required}) genes in query.
+#' @param p_genes (\emph{required}) genes in pathway of interest.
+#' @param u_genes (\emph{required}) genes in universe.
+#' @param alternative (\emph{required}) test for enrichment ('greater'), depletion ('less') or both ('two.sided').
+#'
+#' @import data.table
+#'
+#' @return A named vector.
+#' @export
+#'
+#' @author Thomas Yssing Michaelsen \email{tym@@bio.aau.dk}
+test_pathway <- function(q_genes,p_genes,u_genes,alternative = "greater"){
+
+  k  <- sum(q_genes %in% p_genes)
+  n  <- length(q_genes)
+
+  K  <- sum(u_genes %in% p_genes)
+  N  <- length(u_genes)
+
+  htest <- switch(alternative,
+                  greater = {
+                    Category:::.doHyperGInternal(
+                      numW      = K,
+                      numB      = N - K,
+                      numDrawn  = n,
+                      numWdrawn = k,
+                      over      = T)
+                  },
+                  less = {
+                    Category:::.doHyperGInternal(
+                      numW      = K,
+                      numB      = N - K,
+                      numDrawn  = n,
+                      numWdrawn = k,
+                      over      = F)
+                  },
+                  two.sided = {
+                    upr <- Category:::.doHyperGInternal(
+                      numW      = K,
+                      numB      = N - K,
+                      numDrawn  = n,
+                      numWdrawn = k,
+                      over      = T)
+                    lwr <- Category:::.doHyperGInternal(
+                      numW      = K,
+                      numB      = N - K,
+                      numDrawn  = n,
+                      numWdrawn = k,
+                      over      = F)
+
+                    list(p = {(2*min(c(upr$p,lwr$p))) %>% ifelse(. > 1,1,.)},odds = lwr$odds,expected = lwr$expected)
+                  })
+
+  c(
+    unlist(htest),
+    INquery    = k,
+    Nquery     = n,
+    INuniverse = K,
+    Nuniverse  = N)
+}
 
 #' #' Generates an object of class 'diffexprs' (internal function)
 #' #'
