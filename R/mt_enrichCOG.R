@@ -21,10 +21,12 @@
 #'   \item \strong{plot} - A ggplot barplot showing reduction/enrichment of each entry in \code{type} in percent, relative to the percent found in the entire dataset.
 #' }
 #'
+#' @import ggplot2
 #' @importFrom magrittr %>%
+#' @importFrom dplyr mutate left_join select one_of everything filter starts_with group_by arrange mutate_at distinct ungroup
 #' @importFrom tibble rownames_to_column
+#' @importFrom tidyr gather spread
 #' @importFrom rlang sym
-#' @importFrom dplyr mutate arrange left_join select one_of everything
 #'
 #' @export
 #'
@@ -46,8 +48,10 @@ mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,siz
   # Get the COGs from query genes.
   query_genes <- mmt$mtgene[GeneID %in% GeneIDs][[COGs]] %>% ifelse(is.na(.),"",.)
 
-  # Test on type.
-  grps <- lapply(COG_DB[[type]],"[[","COGs")
+  # Test on type. Remove the entires in type that are missing from query genes.
+  grps  <- lapply(COG_DB[[type]],"[[","COGs")
+  keeps <- lapply(grps,`%in%`,query_genes) %>% sapply(any)
+  grps  <- grps[keeps]
 
   # Perform the tests and tidy data.
   tabout <- t(sapply(grps,test_pathway,q_genes = query_genes,u_genes = uni_genes,alternative = alternative))
@@ -98,7 +102,7 @@ mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,siz
     p_enrich <- ggplot(enrich_pct,aes_string(x = type,y = "value",fill = "variable")) +
       geom_bar(stat = "identity",width = .8) +
       coord_flip(clip = "off") +
-      geom_text(aes_string(label = "padj",x = type,y = "total+.05"),data = pvals,
+      geom_text(aes_string(label = "padj",x = type,y = "total + max(total)*.01"),data = pvals,
                 inherit.aes = F,hjust = 0,vjust = .3,size = size_p) +
       #geom_point(aes(x = x,y = y,shape = "All genes"),data = data.frame(x = Inf,y = -Inf),inherit.aes = F) +
       geom_tile(aes_string(x = type,y = "PosX"),data = pos_point,width = 1,height = max(enrich_pct$total)*0.005,inherit.aes = F) +

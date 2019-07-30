@@ -13,10 +13,10 @@ mt_enrich(mmt,GeneIDs,KOs,type)
 
 \item{type}{(\emph{required}) String refering to which KEGG annotation scheme to use. Choose from the following:
 \itemize{
-  \item \strong{pathway} - TBD.
-  \item \strong{module} - TBD.
-  \item \strong{reaction_class} - TBD.
-  \item \strong{reaction} - TBD.
+  \item \strong{pathway} - Manually curated pathway maps of known molecular interaction, reaction and relation networks.
+  \item \strong{module} - Manually defined functional units.
+  \item \strong{reaction} - Chemical reactions, mostly enzymatic reactions.
+  \item \strong{reaction_class} - Classes of reactions based on the chemical structure transformation patterns of substrate-product pairs.
 }}
 
 \item{KOs}{(\emph{required}) String pointing to the column in mtgene containing KO identifiers.}
@@ -27,9 +27,17 @@ mt_enrich(mmt,GeneIDs,KOs,type)
   \item \strong{less} - test for depletion in genes of interest.
   \item \strong{two.sided} - perform a two-sided test for both in genes of interest.
 }}
+
+\item{show_p}{(\emph{optional}) numeric indicating the threshold p-value for plotting. Default: 1}
+
+\item{size_p}{(\emph{optional}) numeric indicating the size of plotted p-values. Default: 1}
 }
 \value{
-A data.frame
+A list with following:
+\itemize{
+  \item \strong{table} - A table containing the results from the enrichment analysis.
+  \item \strong{plot} - A ggplot barplot showing reduction/enrichment of each entry in \code{type} in percent, relative to the percent found in the entire dataset.
+}
 }
 \description{
 mt_enrichKO

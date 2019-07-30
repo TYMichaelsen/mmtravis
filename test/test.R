@@ -131,8 +131,19 @@ head(mt_res$Table)
 Genes <- sample(mt$mtgene$GeneID,size = 1000)
 head(Genes)
 
-COGenrich <- mt_enrichCOG(mt,GeneIDs = Genes,COGs = "COG",alternative = "two.sided",show_p = 0.01)
+COGenrich <- mt_enrichCOG(mt,GeneIDs = Genes,COGs = "COG",alternative = "two.sided",show_p = 1,size_p = 4)
+
+COGenrich$plot
 
 
 
 
+CP460 <- readRDS("../../../../DNASense ApS Dropbox/DNASense/CP/cp-ongoing/CP460 [BASF Metatranscriptomics]/analysis/output/mt_object.rds")
+
+CP460_CDS <- mt_subset(CP460,sub_genes = "ftype != 'intergenic_region'")
+
+Genes <- mt_subset(CP460,sub_genes = "Genome == 'Bin1'")$mtgene$GeneID
+
+KOenrich <- mt_enrichKO(mmt = CP460,GeneIDs = Genes,type = "reaction",KOs = "KO",show_p = 0.5,size_p = 4)
+
+KOenrich$plot
