@@ -22,6 +22,7 @@
 #' }
 #' @param show_p (\emph{optional}) numeric indicating the threshold p-value for plotting. Default: 1
 #' @param size_p (\emph{optional}) numeric indicating the size of plotted p-values. Default: 1
+#' @param unannotated (\emph{optional}) Should the data for unannotated genes be included in plot? Default: \code{TRUE}.
 #' @return A list with following:
 #' \itemize{
 #'   \item \strong{table} - A table containing the results from the enrichment analysis.
@@ -46,7 +47,7 @@
 #' }
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@bio.aau.dk}
-mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,size_p = 1){
+mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,size_p = 1,unannotated = T){
 
   # Use all KOs identified as background universe.
   uni_genes <- mmt$mtgene[[KOs]] %>%
@@ -54,7 +55,8 @@ mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,
     lapply(function(x){
       if(x == "") x <- "" else x <- strsplit(x,split = ";")[[1]]
       return(x)
-    }) %>% unlist()
+    }) %>% unlist() %>%
+    ifelse(. == "","None",.)
 
   # Get the KOs from query genes.
   query_genes <- mmt$mtgene[GeneID %in% GeneIDs][[KOs]] %>%
@@ -62,7 +64,8 @@ mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,
     lapply(function(x){
       if(x == "") x <- "" else x <- strsplit(x,split = ";")[[1]]
       return(x)
-    }) %>% unlist()
+    }) %>% unlist() %>%
+    ifelse(. == "","None",.)
 
   # Test on type. Remove the entires in type that are missing from query genes.
   grps  <- lapply(KEGG_DB[[type]],"[[","KOs")
@@ -82,6 +85,9 @@ mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,
 
   # Make the plot.--------------------------------------------------------------
   enrich_pct <- filter(tabout,INuniverse > 0 & padj <= show_p)
+  if(!unannotated){
+    enrich_pct <- filter(enrich_pct,!!sym(type) != "None")
+  }
   if (nrow(enrich_pct) < 1){
     p_enrich <- paste0("No ",type," with adjusted p-value <= ",show_p)
   } else {
@@ -126,11 +132,8 @@ mt_enrichKO <- function(mmt,GeneIDs,type,KOs,alternative = "greater",show_p = 1,
         values = cols,
         breaks = c("pct_added","pct_overlap"),
         labels = c("Enriched", "Reduced")) +
-      #scale_shape_manual(
-      #  values = c("All genes" = "|")) +
       scale_y_continuous(
         expand = expand_scale(mult = c(0,.1)),
-        #breaks = seq(0,8,1),
         limits = c(0,max(enrich_pct$total)*1.06)) +
       labs(
         y = "Percentage of genes [%]",

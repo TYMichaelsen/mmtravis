@@ -31,6 +31,8 @@ mt_enrich(mmt,GeneIDs,KOs,type)
 \item{show_p}{(\emph{optional}) numeric indicating the threshold p-value for plotting. Default: 1}
 
 \item{size_p}{(\emph{optional}) numeric indicating the size of plotted p-values. Default: 1}
+
+\item{unannotated}{(\emph{optional}) Should the data for unannotated genes be included in plot? Default: \code{TRUE}.}
 }
 \value{
 A list with following:

@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Download all KO terms.
+wget -q -O - http://rest.kegg.jp/list/ko | awk 'BEGIN {print "KO"} {sub(/ko:/,"",$1); print $1}' > all_ko.tsv
+
+### DOWNLOAD ENTRIES AND DESCRIPTIONS ##########################################
+
+# Download all pathways, with description.
+wget -O - 'http://rest.kegg.jp/list/pathway' | awk 'BEGIN {FS="\t"; OFS="\t"; print "Pathway","Description"} {sub(/path:/,"",$1); print $0}' > mapping/pathway_names.tsv
+
+# Download all modules, with description.
+wget -O - 'http://rest.kegg.jp/list/module' | awk 'BEGIN {FS="\t"; OFS="\t"; print "Module","Description"} {sub(/md:/,"",$1); print $0}' > mapping/module_names.tsv
+
+# Download all reactions, with description.
+wget -O - 'http://rest.kegg.jp/list/reaction' | awk 'BEGIN {FS="\t"; OFS="\t"; print "Reaction","Description"} {sub(/rn:/,"",$1); print $0}' > mapping/reaction_names.tsv
+
+# Download all reaction classes, with description.
+wget -O - 'http://rest.kegg.jp/list/rclass' | awk 'BEGIN {FS="\t"; OFS="\t"; print "Reaction_class","Description"} {sub(/rc:/,"",$1); print $0}' > mapping/reaction-class_names.tsv
+
+# Download all EC numbers, with description.
+wget -O - 'http://rest.kegg.jp/list/ec' | awk 'BEGIN {FS="\t"; OFS="\t"; print "EC","Description"} {sub(/ec:/,"",$1); print $0}' > mapping/ec_names.tsv
+
+# Download all compounds, with description.
+wget -O - 'http://rest.kegg.jp/list/compound' | awk 'BEGIN {FS="\t"; OFS="\t"; print "Compound","Description"} {sub(/cpd:/,"",$1); print $0}' > mapping/compound_names.tsv
+
+### DOWNLOAD MAPPINGS ##########################################################
+
+# Pathway to KO.
+wget -O - 'http://rest.kegg.jp/link/ko/pathway' | awk 'BEGIN {OFS="\t"; print "Pathway\tKO"} /path:map/ {sub(/path:/,"",$1); sub(/ko:/,"",$2); print $0}' > mapping/pathway_to_ko.tsv
+
+# Module to KO.
+wget -O - 'http://rest.kegg.jp/link/ko/module' | awk 'BEGIN {OFS="\t"; print "Module\tKO"} {sub(/md:/,"",$1); sub(/ko:/,"",$2); print $0}' > mapping/module_to_ko.tsv
+
+# Reaction to KO.
+wget -O - 'http://rest.kegg.jp/link/ko/reaction' | awk 'BEGIN {OFS="\t"; print "Reaction\tKO"} {sub(/rn:/,"",$1); sub(/ko:/,"",$2); print $0}' > mapping/reaction_to_ko.tsv
+
+# Reaction class to KO.
+wget -O - 'http://rest.kegg.jp/link/ko/rclass' | awk 'BEGIN {OFS="\t"; print "Reaction_class\tKO"} {sub(/rc:/,"",$1); sub(/ko:/,"",$2); print $0}' > mapping/reaction-class_to_ko.tsv
+
+# EC to KO.
+wget -O - 'http://rest.kegg.jp/link/ko/ec' | awk 'BEGIN {OFS="\t"; print "EC\tKO"} {sub(/ec:/,"",$1); sub(/ko:/,"",$2); print $0}' > mapping/ec_to_ko.tsv
+
+# Compound to Reaction.
+wget -O - 'http://rest.kegg.jp/link/reaction/compound' | awk 'BEGIN {OFS="\t"; print "Compound\tReaction"} {sub(/cpd:/,"",$1); sub(/rn:/,"",$2); print $0}' > mapping/compound_to_reaction.tsv
+### MERGE AND CREATE R-OBJECT ##################################################
+
+R mergeData.R

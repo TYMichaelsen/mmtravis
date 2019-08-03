@@ -13,8 +13,9 @@
 #'   \item \strong{less} - test for depletion in genes of interest.
 #'   \item \strong{two.sided} - perform a two-sided test for both in genes of interest.
 #' }
-#' @param show_p (\emph{optional}) numeric indicating the threshold p-value for plotting. Default: 1
-#' @param size_p (\emph{optional}) numeric indicating the size of plotted p-values. Default: 1
+#' @param show_p (\emph{optional}) Numeric indicating the threshold p-value for plotting. Default: 1
+#' @param size_p (\emph{optional}) Numeric indicating the size of plotted p-values. Default: 1
+#' @param unannotated (\emph{optional}) Should the data for unannotated genes be included in plot? Default: \code{TRUE}.
 #' @return A list with following:
 #' \itemize{
 #'   \item \strong{table} - A table containing the results from the enrichment analysis.
@@ -39,14 +40,18 @@
 #' }
 #'
 #' @author Thomas Yssing Michaelsen \email{tym@bio.aau.dk}
-mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,size_p = 1){
+mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,size_p = 1,unannotated = T){
   type = "Category"
 
   # Use all COGs identified as background universe.
-  uni_genes <- mmt$mtgene[[COGs]] %>% ifelse(is.na(.),"",.)
+  uni_genes <- mmt$mtgene[[COGs]] %>%
+    ifelse(is.na(.),"",.) %>%
+    ifelse(. == "","None",.)
 
   # Get the COGs from query genes.
-  query_genes <- mmt$mtgene[GeneID %in% GeneIDs][[COGs]] %>% ifelse(is.na(.),"",.)
+  query_genes <- mmt$mtgene[GeneID %in% GeneIDs][[COGs]] %>%
+    ifelse(is.na(.),"",.) %>%
+    ifelse(. == "","None",.)
 
   # Test on type. Remove the entires in type that are missing from query genes.
   grps  <- lapply(COG_DB[[type]],"[[","COGs")
@@ -66,8 +71,11 @@ mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,siz
 
   # Make the plot.--------------------------------------------------------------
   enrich_pct <- filter(tabout,INuniverse > 0 & padj <= show_p)
+  if(!unannotated){
+    enrich_pct <- filter(enrich_pct,!!sym(type) != "None")
+  }
   if (nrow(enrich_pct) < 1){
-    p_enrich <- paste0("No ",type," with adjusted p-value <= ",show_p)
+    p_enrich <- paste0("There is no data to plot!")
   } else {
     enrich_pct <- enrich_pct %>%
       mutate(base   = INuniverse/Nuniverse*100) %>%
@@ -114,7 +122,6 @@ mt_enrichCOG <- function(mmt,GeneIDs,COGs,alternative = "greater",show_p = 1,siz
       #  values = c("All genes" = "|")) +
       scale_y_continuous(
         expand = expand_scale(mult = c(0,.1)),
-        breaks = seq(0,8,1),
         limits = c(0,max(enrich_pct$total)*1.06)) +
       labs(
         y = "Percentage of genes [%]",
